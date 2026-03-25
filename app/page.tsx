@@ -1,172 +1,124 @@
-"use client";
+import Link from "next/link";
+import type { Metadata } from "next";
 
-import { useState } from "react";
+export const metadata: Metadata = {
+  title: "Free Invoice Generator - Instant PDF, No Signup",
+  description: "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+  openGraph: {
+    title: "Free Invoice Generator - Instant PDF, No Signup",
+    description: "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+    type: "website",
+    url: "https://invoicegenerator.app",
+    siteName: "Free Invoice Generator",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Invoice Generator - Instant PDF, No Signup",
+    description: "Create professional invoices in seconds. Free, no signup required.",
+  },
+};
 
-interface LineItem {
-  description: string;
-  quantity: number;
-  rate: number;
-}
-
-export default function InvoicePage() {
-  const [clientName, setClientName] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [invoiceNumber, setInvoiceNumber] = useState("INV-001");
-  const [invoiceDate, setInvoiceDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [items, setItems] = useState<LineItem[]>([
-    { description: "", quantity: 1, rate: 0 },
-  ]);
-
-  const addItem = () =>
-    setItems([...items, { description: "", quantity: 1, rate: 0 }]);
-
-  const updateItem = (index: number, field: keyof LineItem, value: string | number) => {
-    const updated = [...items];
-    updated[index] = { ...updated[index], [field]: value };
-    setItems(updated);
+export default function LandingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Free Invoice Generator",
+    url: "https://invoicegenerator.app",
+    description:
+      "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "All",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    featureList: [
+      "Instant PDF download",
+      "No signup required",
+      "Professional invoice templates",
+      "Line item management",
+      "Automatic totals",
+    ],
   };
 
-  const total = items.reduce((sum, item) => sum + item.quantity * item.rate, 0);
-
   return (
-    <main className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900">Invoice Generator</h1>
-          <p className="text-gray-500 mt-1">Create and download professional invoices</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
-          {/* Invoice Meta */}
-          <section>
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Invoice Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Invoice #</label>
-                <input
-                  type="text"
-                  value={invoiceNumber}
-                  onChange={(e) => setInvoiceNumber(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Invoice Date</label>
-                <input
-                  type="date"
-                  value={invoiceDate}
-                  onChange={(e) => setInvoiceDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Due Date</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Client Info */}
-          <section>
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Bill To</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Client Name</label>
-                <input
-                  type="text"
-                  placeholder="Acme Corp"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Client Email</label>
-                <input
-                  type="email"
-                  placeholder="billing@acme.com"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Line Items */}
-          <section>
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Line Items</h2>
-            <div className="space-y-3">
-              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide px-1">
-                <span className="col-span-6">Description</span>
-                <span className="col-span-2 text-center">Qty</span>
-                <span className="col-span-2 text-right">Rate ($)</span>
-                <span className="col-span-2 text-right">Amount</span>
-              </div>
-              {items.map((item, i) => (
-                <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Service description"
-                    value={item.description}
-                    onChange={(e) => updateItem(i, "description", e.target.value)}
-                    className="col-span-6 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(i, "quantity", Number(e.target.value))}
-                    className="col-span-2 border border-gray-300 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={item.rate}
-                    onChange={(e) => updateItem(i, "rate", Number(e.target.value))}
-                    className="col-span-2 border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <div className="col-span-2 text-right text-sm font-medium text-gray-700">
-                    ${(item.quantity * item.rate).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={addItem}
-              className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium"
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main className="min-h-screen bg-gray-50">
+        {/* Hero */}
+        <section className="py-20 px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
+              Free Invoice Generator
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-xl mx-auto">
+              Create professional invoices in seconds. Download as PDF instantly.
+              No signup, no fuss.
+            </p>
+            <Link
+              href="/invoice"
+              className="inline-block px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md"
             >
-              + Add Item
-            </button>
-          </section>
+              Create Invoice — Free
+            </Link>
+          </div>
+        </section>
 
-          {/* Total */}
-          <div className="flex justify-end border-t border-gray-100 pt-6">
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Total Amount</p>
-              <p className="text-3xl font-bold text-gray-900">${total.toFixed(2)}</p>
+        {/* Features */}
+        <section className="py-16 px-4 bg-white">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
+              Everything you need, nothing you don&apos;t
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              <div className="p-6">
+                <div className="text-4xl mb-3">⚡</div>
+                <h3 className="font-semibold text-gray-900 mb-2">Instant PDF</h3>
+                <p className="text-gray-500 text-sm">
+                  Generate a professional PDF invoice in one click. No waiting, no email.
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="text-4xl mb-3">🔓</div>
+                <h3 className="font-semibold text-gray-900 mb-2">No Signup</h3>
+                <p className="text-gray-500 text-sm">
+                  No account needed. Just fill in your details and download.
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="text-4xl mb-3">💼</div>
+                <h3 className="font-semibold text-gray-900 mb-2">Professional</h3>
+                <p className="text-gray-500 text-sm">
+                  Clean, professional templates trusted by freelancers and small businesses.
+                </p>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <button className="px-5 py-2 text-sm font-medium border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-              Preview
-            </button>
-            <button className="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Download PDF
-            </button>
+        {/* CTA */}
+        <section className="py-16 px-4 text-center">
+          <div className="max-w-xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Ready to send your first invoice?
+            </h2>
+            <Link
+              href="/invoice"
+              className="inline-block px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+            >
+              Get Started Free
+            </Link>
           </div>
-        </div>
-      </div>
-    </main>
+        </section>
+
+        <footer className="py-8 text-center text-gray-400 text-sm border-t border-gray-100">
+          Free Invoice Generator — No signup required
+        </footer>
+      </main>
+    </>
   );
 }
