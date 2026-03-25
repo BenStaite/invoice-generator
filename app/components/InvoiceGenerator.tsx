@@ -26,6 +26,20 @@ export interface InvoiceData {
   discountValue: number
   paymentTerms: string
   notes: string
+  currency: string
+  template: 'classic' | 'modern' | 'minimal'
+}
+
+export const CURRENCIES: Record<string, { symbol: string; label: string }> = {
+  USD: { symbol: '$', label: 'USD – US Dollar' },
+  EUR: { symbol: '€', label: 'EUR – Euro' },
+  GBP: { symbol: '£', label: 'GBP – British Pound' },
+  CAD: { symbol: 'CA$', label: 'CAD – Canadian Dollar' },
+  AUD: { symbol: 'A$', label: 'AUD – Australian Dollar' },
+}
+
+export function getCurrencySymbol(currency: string): string {
+  return CURRENCIES[currency]?.symbol ?? '$'
 }
 
 function generateId() {
@@ -48,6 +62,8 @@ const initialData: InvoiceData = {
   discountValue: 0,
   paymentTerms: 'Net 30',
   notes: '',
+  currency: 'USD',
+  template: 'classic',
 }
 
 export function calculateTotals(data: InvoiceData) {

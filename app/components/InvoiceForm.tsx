@@ -1,4 +1,4 @@
-import { type InvoiceData, type LineItem, generateId, calculateTotals } from './InvoiceGenerator'
+import { type InvoiceData, type LineItem, generateId, calculateTotals, CURRENCIES, getCurrencySymbol } from './InvoiceGenerator'
 
 interface InvoiceFormProps {
   data: InvoiceData
@@ -25,7 +25,15 @@ const inputClass =
 const textareaClass =
   'rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-y'
 
+const TEMPLATES = [
+  { value: 'classic', label: 'Classic' },
+  { value: 'modern', label: 'Modern' },
+  { value: 'minimal', label: 'Minimal' },
+]
+
 export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
+  const sym = getCurrencySymbol(data.currency)
+
   function update(patch: Partial<InvoiceData>) {
     onChange({ ...data, ...patch })
   }
@@ -62,6 +70,32 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Invoice Generator</h1>
+
+      {/* Template & Currency */}
+      <div className="grid grid-cols-2 gap-4">
+        <Field label="Template">
+          <select
+            className={inputClass}
+            value={data.template}
+            onChange={(e) => update({ template: e.target.value as InvoiceData['template'] })}
+          >
+            {TEMPLATES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Currency">
+          <select
+            className={inputClass}
+            value={data.currency}
+            onChange={(e) => update({ currency: e.target.value })}
+          >
+            {Object.entries(CURRENCIES).map(([code, { label }]) => (
+              <option key={code} value={code}>{label}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
 
       {/* Sender & Client */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -144,7 +178,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
               <tr className="text-left text-gray-600 border-b">
                 <th className="pb-2 pr-2 font-medium">Description</th>
                 <th className="pb-2 pr-2 font-medium w-20">Qty</th>
-                <th className="pb-2 pr-2 font-medium w-28">Unit Price</th>
+                <th className="pb-2 pr-2 font-medium w-28">Unit Price ({sym})</th>
                 <th className="pb-2 pr-2 font-medium w-24 text-right">Subtotal</th>
                 <th className="pb-2 w-10"></th>
               </tr>
@@ -191,7 +225,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                     />
                   </td>
                   <td className="py-2 pr-2 text-right font-mono text-gray-700">
-                    ${(item.quantity * item.unitPrice).toFixed(2)}
+                    {sym}{(item.quantity * item.unitPrice).toFixed(2)}
                   </td>
                   <td className="py-2">
                     <button
@@ -252,7 +286,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   update({ discountType: e.target.value as 'flat' | 'percentage' })
                 }
               >
-                <option value="flat">$ (flat)</option>
+                <option value="flat">{sym} (flat)</option>
                 <option value="percentage">%</option>
               </select>
             </div>
@@ -262,9 +296,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
       {/* Summary */}
       <div className="text-sm text-right space-y-1 border-t pt-3 text-gray-700">
-        <p>Subtotal: <span className="font-mono">${subtotal.toFixed(2)}</span></p>
+        <p>Subtotal: <span className="font-mono">{sym}{subtotal.toFixed(2)}</span></p>
         <p className="font-semibold text-base text-gray-900">
-          Total: <span className="font-mono">${total.toFixed(2)}</span>
+          Total: <span className="font-mono">{sym}{total.toFixed(2)}</span>
         </p>
       </div>
 
