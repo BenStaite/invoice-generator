@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
+import DownloadPDFButton from './DownloadPDFButton'
 
 export interface LineItem {
   id: string
@@ -68,18 +69,24 @@ export { generateId }
 
 export default function InvoiceGenerator() {
   const [data, setData] = useState<InvoiceData>(initialData)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50">
         <InvoiceForm data={data} onChange={setData} />
+        <div className="mt-6">
+          <DownloadPDFButton data={data} previewRef={previewRef} />
+        </div>
       </div>
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200">
         <div className="sticky top-0">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Live Preview
           </h2>
-          <InvoicePreview data={data} />
+          <div ref={previewRef}>
+            <InvoicePreview data={data} />
+          </div>
         </div>
       </div>
     </div>
