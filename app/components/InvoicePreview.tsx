@@ -1,4 +1,4 @@
-import { type InvoiceData, calculateTotals } from './InvoiceGenerator'
+import { type InvoiceData, calculateTotals, getCurrencySymbol } from './InvoiceGenerator'
 
 interface InvoicePreviewProps {
   data: InvoiceData
@@ -10,12 +10,8 @@ function formatDate(dateStr: string) {
   return `${month}/${day}/${year}`
 }
 
-function formatCurrency(amount: number) {
-  return amount.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  })
+function formatCurrency(amount: number, symbol: string) {
+  return `${symbol}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 function MultilineText({ text }: { text: string }) {
@@ -32,9 +28,11 @@ function MultilineText({ text }: { text: string }) {
   )
 }
 
-export default function InvoicePreview({ data }: InvoicePreviewProps) {
+// ─── Classic Template ────────────────────────────────────────────────────────
+function ClassicTemplate({ data }: InvoicePreviewProps) {
   const { subtotal, discount, tax, total } = calculateTotals(data)
   const hasDiscount = data.discountValue > 0
+  const sym = getCurrencySymbol(data.currency)
 
   return (
     <div className="bg-white shadow-lg rounded-sm p-8 sm:p-10 max-w-[640px] mx-auto text-gray-900 text-sm leading-relaxed font-[system-ui]">
@@ -113,10 +111,10 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
               </td>
               <td className="py-2.5 text-right font-mono text-xs">{item.quantity}</td>
               <td className="py-2.5 text-right font-mono text-xs">
-                {formatCurrency(item.unitPrice)}
+                {formatCurrency(item.unitPrice, sym)}
               </td>
               <td className="py-2.5 text-right font-mono text-xs">
-                {formatCurrency(item.quantity * item.unitPrice)}
+                {formatCurrency(item.quantity * item.unitPrice, sym)}
               </td>
             </tr>
           ))}
@@ -128,7 +126,7 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
         <div className="w-56 space-y-1 text-xs">
           <div className="flex justify-between py-1">
             <span className="text-gray-500">Subtotal</span>
-            <span className="font-mono">{formatCurrency(subtotal)}</span>
+            <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
           </div>
           {hasDiscount && (
             <div className="flex justify-between py-1 text-red-600">
@@ -138,18 +136,18 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
                   ? ` (${data.discountValue}%)`
                   : ''}
               </span>
-              <span className="font-mono">-{formatCurrency(discount)}</span>
+              <span className="font-mono">-{formatCurrency(discount, sym)}</span>
             </div>
           )}
           {data.taxRate > 0 && (
             <div className="flex justify-between py-1">
               <span className="text-gray-500">Tax ({data.taxRate}%)</span>
-              <span className="font-mono">{formatCurrency(tax)}</span>
+              <span className="font-mono">{formatCurrency(tax, sym)}</span>
             </div>
           )}
           <div className="flex justify-between py-2 border-t-2 border-gray-800 text-base font-bold">
             <span>Total</span>
-            <span className="font-mono">{formatCurrency(total)}</span>
+            <span className="font-mono">{formatCurrency(total, sym)}</span>
           </div>
         </div>
       </div>
@@ -177,4 +175,227 @@ export default function InvoicePreview({ data }: InvoicePreviewProps) {
       )}
     </div>
   )
+}
+
+// ─── Modern Template ─────────────────────────────────────────────────────────
+function ModernTemplate({ data }: InvoicePreviewProps) {
+  const { subtotal, discount, tax, total } = calculateTotals(data)
+  const hasDiscount = data.discountValue > 0
+  const sym = getCurrencySymbol(data.currency)
+  const accent = '#2563eb' // blue-600
+
+  return (
+    <div className="bg-white shadow-lg rounded-sm max-w-[640px] mx-auto text-gray-900 text-sm leading-relaxed font-[system-ui] overflow-hidden">
+      {/* Colored header bar */}
+      <div style={{ backgroundColor: accent }} className="px-8 py-6 text-white">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-2xl font-extrabold tracking-tight">
+              {data.senderName || <span className="opacity-50">Your Name</span>}
+            </p>
+            <p className="text-xs opacity-75 mt-1 whitespace-pre-line">
+              {data.senderAddress || ''}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-3xl font-black uppercase tracking-widest opacity-90">Invoice</p>
+            <p className="text-xs opacity-70 mt-1">#{data.invoiceNumber || '—'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Meta row */}
+      <div className="flex justify-between px-8 py-5 bg-blue-50">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1">Bill To</p>
+          <p className="font-semibold text-gray-800">
+            {data.clientName || <span className="text-gray-300">Client Name</span>}
+          </p>
+          <p className="text-gray-500 text-xs mt-0.5 whitespace-pre-line">
+            <MultilineText text={data.clientAddress} />
+          </p>
+        </div>
+        <div className="text-right text-xs space-y-2">
+          <div>
+            <p className="text-blue-400 font-bold uppercase tracking-wider">Date</p>
+            <p className="font-medium text-gray-700">{formatDate(data.invoiceDate)}</p>
+          </div>
+          <div>
+            <p className="text-blue-400 font-bold uppercase tracking-wider">Due</p>
+            <p className="font-medium text-gray-700">{formatDate(data.dueDate)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Line items */}
+      <div className="px-8 py-6">
+        <table className="w-full mb-6">
+          <thead>
+            <tr style={{ borderBottom: `2px solid ${accent}` }} className="text-xs uppercase tracking-wider">
+              <th className="text-left py-2 font-bold text-gray-600">Description</th>
+              <th className="text-right py-2 font-bold text-gray-600 w-16">Qty</th>
+              <th className="text-right py-2 font-bold text-gray-600 w-24">Unit Price</th>
+              <th className="text-right py-2 font-bold text-gray-600 w-24">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.lineItems.map((item, i) => (
+              <tr key={item.id} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                <td className="py-2.5 px-1">
+                  {item.description || <span className="text-gray-300 italic">No description</span>}
+                </td>
+                <td className="py-2.5 text-right font-mono text-xs px-1">{item.quantity}</td>
+                <td className="py-2.5 text-right font-mono text-xs px-1">{formatCurrency(item.unitPrice, sym)}</td>
+                <td className="py-2.5 text-right font-mono text-xs font-semibold px-1">{formatCurrency(item.quantity * item.unitPrice, sym)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Totals */}
+        <div className="flex justify-end">
+          <div className="w-60 space-y-1 text-xs">
+            <div className="flex justify-between py-1 text-gray-500">
+              <span>Subtotal</span>
+              <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
+            </div>
+            {hasDiscount && (
+              <div className="flex justify-between py-1 text-red-500">
+                <span>Discount{data.discountType === 'percentage' ? ` (${data.discountValue}%)` : ''}</span>
+                <span className="font-mono">-{formatCurrency(discount, sym)}</span>
+              </div>
+            )}
+            {data.taxRate > 0 && (
+              <div className="flex justify-between py-1 text-gray-500">
+                <span>Tax ({data.taxRate}%)</span>
+                <span className="font-mono">{formatCurrency(tax, sym)}</span>
+              </div>
+            )}
+            <div
+              style={{ backgroundColor: accent }}
+              className="flex justify-between px-3 py-2 rounded text-white text-sm font-bold mt-2"
+            >
+              <span>Total</span>
+              <span className="font-mono">{formatCurrency(total, sym)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        {(data.paymentTerms || data.notes) && (
+          <div className="mt-6 pt-4 border-t border-gray-200 space-y-3 text-xs text-gray-500">
+            {data.paymentTerms && (
+              <p><span className="font-bold text-gray-400 uppercase tracking-wider">Terms: </span>{data.paymentTerms}</p>
+            )}
+            {data.notes && (
+              <p className="whitespace-pre-line"><span className="font-bold text-gray-400 uppercase tracking-wider">Notes: </span>{data.notes}</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Minimal Template ────────────────────────────────────────────────────────
+function MinimalTemplate({ data }: InvoicePreviewProps) {
+  const { subtotal, discount, tax, total } = calculateTotals(data)
+  const hasDiscount = data.discountValue > 0
+  const sym = getCurrencySymbol(data.currency)
+
+  return (
+    <div className="bg-white shadow-lg max-w-[640px] mx-auto text-gray-800 text-sm leading-relaxed" style={{ fontFamily: 'Georgia, serif', padding: '3rem' }}>
+      {/* Top row */}
+      <div className="flex justify-between items-baseline mb-12">
+        <p className="text-lg font-bold tracking-tight">
+          {data.senderName || <span className="text-gray-300">Your Name</span>}
+        </p>
+        <p className="text-4xl font-light tracking-[0.2em] uppercase text-gray-400">Invoice</p>
+      </div>
+
+      {/* Two column: bill-to + meta */}
+      <div className="flex justify-between mb-10 text-xs">
+        <div>
+          <p className="font-semibold mb-1">{data.clientName || <span className="text-gray-300">Client Name</span>}</p>
+          <p className="text-gray-500 whitespace-pre-line"><MultilineText text={data.clientAddress} /></p>
+          {data.senderAddress && (
+            <p className="text-gray-400 mt-2 whitespace-pre-line"><MultilineText text={data.senderAddress} /></p>
+          )}
+        </div>
+        <div className="text-right space-y-1 text-gray-500">
+          <p><span className="font-semibold">No.</span> {data.invoiceNumber || '—'}</p>
+          <p><span className="font-semibold">Date</span> {formatDate(data.invoiceDate)}</p>
+          <p><span className="font-semibold">Due</span> {formatDate(data.dueDate)}</p>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-300 mb-6" />
+
+      {/* Line items */}
+      <table className="w-full mb-8 text-xs">
+        <thead>
+          <tr className="text-gray-400 uppercase tracking-widest border-b border-gray-200">
+            <th className="text-left pb-2 font-normal">Description</th>
+            <th className="text-right pb-2 font-normal w-12">Qty</th>
+            <th className="text-right pb-2 font-normal w-24">Rate</th>
+            <th className="text-right pb-2 font-normal w-24">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.lineItems.map((item) => (
+            <tr key={item.id} className="border-b border-gray-100">
+              <td className="py-2">
+                {item.description || <span className="text-gray-300 italic">—</span>}
+              </td>
+              <td className="py-2 text-right text-gray-500">{item.quantity}</td>
+              <td className="py-2 text-right text-gray-500 font-mono">{formatCurrency(item.unitPrice, sym)}</td>
+              <td className="py-2 text-right font-mono">{formatCurrency(item.quantity * item.unitPrice, sym)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Totals */}
+      <div className="flex justify-end mb-8">
+        <div className="w-48 text-xs space-y-1">
+          <div className="flex justify-between text-gray-500">
+            <span>Subtotal</span>
+            <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
+          </div>
+          {hasDiscount && (
+            <div className="flex justify-between text-red-500">
+              <span>Discount</span>
+              <span className="font-mono">-{formatCurrency(discount, sym)}</span>
+            </div>
+          )}
+          {data.taxRate > 0 && (
+            <div className="flex justify-between text-gray-500">
+              <span>Tax ({data.taxRate}%)</span>
+              <span className="font-mono">{formatCurrency(tax, sym)}</span>
+            </div>
+          )}
+          <div className="flex justify-between border-t border-gray-400 pt-2 text-base font-bold text-gray-900">
+            <span>Total</span>
+            <span className="font-mono">{formatCurrency(total, sym)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      {(data.paymentTerms || data.notes) && (
+        <div className="border-t border-gray-200 pt-4 text-xs text-gray-400 space-y-1">
+          {data.paymentTerms && <p>{data.paymentTerms}</p>}
+          {data.notes && <p className="whitespace-pre-line">{data.notes}</p>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Router ──────────────────────────────────────────────────────────────────
+export default function InvoicePreview({ data }: InvoicePreviewProps) {
+  if (data.template === 'modern') return <ModernTemplate data={data} />
+  if (data.template === 'minimal') return <MinimalTemplate data={data} />
+  return <ClassicTemplate data={data} />
 }
