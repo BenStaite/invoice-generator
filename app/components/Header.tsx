@@ -1,0 +1,46 @@
+'use client'
+
+import Link from 'next/link'
+import { useSession, signOut } from 'next-auth/react'
+import { Button } from '@/components/ui/button'
+import { FileTextIcon } from '@radix-ui/react-icons'
+
+export function Header() {
+  const { data: session, status } = useSession()
+
+  return (
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100">
+          <FileTextIcon className="w-5 h-5 text-blue-600" />
+          Invoice Generator
+        </Link>
+        <nav className="flex items-center gap-3">
+          {status === 'loading' ? null : session ? (
+            <>
+              <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
+                Signed in as {session.user?.email}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/auth/login">Log in</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/auth/signup">Sign up</Link>
+              </Button>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
+  )
+}
