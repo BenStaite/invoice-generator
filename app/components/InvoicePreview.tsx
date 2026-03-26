@@ -15,7 +15,7 @@ function formatCurrency(amount: number, symbol: string) {
 }
 
 function MultilineText({ text }: { text: string }) {
-  if (!text) return <span className="text-gray-300 italic">—</span>
+  if (!text) return <span className="text-gray-500 italic">—</span>
   return (
     <>
       {text.split('\n').map((line, i) => (
@@ -44,7 +44,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
             <img src={data.logo} alt="Logo" className="max-h-14 max-w-[160px] object-contain mb-2" />
           )}
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {data.senderName || <span className="text-gray-300">Your Name</span>}
+            {data.senderName || <span className="text-gray-500">Your Name</span>}
           </h2>
           <p className="text-gray-500 mt-1 text-xs whitespace-pre-line">
             <MultilineText text={data.senderAddress} />
@@ -60,11 +60,11 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
       {/* Invoice meta + Bill To */}
       <div className="flex justify-between mb-8">
         <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+          <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
             Bill To
           </p>
           <p className="font-semibold">
-            {data.clientName || <span className="text-gray-300">Client Name</span>}
+            {data.clientName || <span className="text-gray-500">Client Name</span>}
           </p>
           <p className="text-gray-500 text-xs whitespace-pre-line mt-0.5">
             <MultilineText text={data.clientAddress} />
@@ -72,21 +72,21 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
         </div>
         <div className="text-right text-xs space-y-1">
           <p>
-            <span className="text-gray-400 font-semibold uppercase tracking-wider">
+            <span className="text-gray-600 font-semibold uppercase tracking-wider">
               Invoice #
             </span>
             <br />
             <span className="font-medium">{data.invoiceNumber || '—'}</span>
           </p>
           <p>
-            <span className="text-gray-400 font-semibold uppercase tracking-wider">
+            <span className="text-gray-600 font-semibold uppercase tracking-wider">
               Date
             </span>
             <br />
             <span className="font-medium">{formatDate(data.invoiceDate)}</span>
           </p>
           <p>
-            <span className="text-gray-400 font-semibold uppercase tracking-wider">
+            <span className="text-gray-600 font-semibold uppercase tracking-wider">
               Due Date
             </span>
             <br />
@@ -110,7 +110,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
             <tr key={item.id} className="border-b border-gray-100">
               <td className="py-2.5">
                 {item.description || (
-                  <span className="text-gray-300 italic">No description</span>
+                  <span className="text-gray-500 italic">No description</span>
                 )}
               </td>
               <td className="py-2.5 text-right font-mono text-xs">{item.quantity}</td>
@@ -161,7 +161,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
         <div className="mt-8 pt-6 border-t border-gray-200 space-y-3 text-xs text-gray-500">
           {data.paymentTerms && (
             <div>
-              <p className="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+              <p className="font-semibold text-gray-600 uppercase tracking-wider mb-0.5">
                 Payment Terms
               </p>
               <p>{data.paymentTerms}</p>
@@ -169,7 +169,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
           )}
           {data.notes && (
             <div>
-              <p className="font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+              <p className="font-semibold text-gray-600 uppercase tracking-wider mb-0.5">
                 Notes
               </p>
               <p className="whitespace-pre-line">{data.notes}</p>
@@ -217,7 +217,7 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1">Bill To</p>
           <p className="font-semibold text-gray-800">
-            {data.clientName || <span className="text-gray-300">Client Name</span>}
+            {data.clientName || <span className="text-gray-500">Client Name</span>}
           </p>
           <p className="text-gray-500 text-xs mt-0.5 whitespace-pre-line">
             <MultilineText text={data.clientAddress} />
@@ -250,7 +250,7 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
             {data.lineItems.map((item, i) => (
               <tr key={item.id} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                 <td className="py-2.5 px-1">
-                  {item.description || <span className="text-gray-300 italic">No description</span>}
+                  {item.description || <span className="text-gray-500 italic">No description</span>}
                 </td>
                 <td className="py-2.5 text-right font-mono text-xs px-1">{item.quantity}</td>
                 <td className="py-2.5 text-right font-mono text-xs px-1">{formatCurrency(item.unitPrice, sym)}</td>
@@ -293,10 +293,10 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
         {(data.paymentTerms || data.notes) && (
           <div className="mt-6 pt-4 border-t border-gray-200 space-y-3 text-xs text-gray-500">
             {data.paymentTerms && (
-              <p><span className="font-bold text-gray-400 uppercase tracking-wider">Terms: </span>{data.paymentTerms}</p>
+              <p><span className="font-bold text-gray-600 uppercase tracking-wider">Terms: </span>{data.paymentTerms}</p>
             )}
             {data.notes && (
-              <p className="whitespace-pre-line"><span className="font-bold text-gray-400 uppercase tracking-wider">Notes: </span>{data.notes}</p>
+              <p className="whitespace-pre-line"><span className="font-bold text-gray-600 uppercase tracking-wider">Notes: </span>{data.notes}</p>
             )}
           </div>
         )}
@@ -321,19 +321,19 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
             <img src={data.logo} alt="Logo" className="max-h-12 max-w-[140px] object-contain mb-2" />
           )}
           <p className="text-lg font-bold tracking-tight">
-            {data.senderName || <span className="text-gray-300">Your Name</span>}
+            {data.senderName || <span className="text-gray-500">Your Name</span>}
           </p>
         </div>
-        <p className="text-4xl font-light tracking-[0.2em] uppercase text-gray-400">Invoice</p>
+        <p className="text-4xl font-light tracking-[0.2em] uppercase text-gray-600">Invoice</p>
       </div>
 
       {/* Two column: bill-to + meta */}
       <div className="flex justify-between mb-10 text-xs">
         <div>
-          <p className="font-semibold mb-1">{data.clientName || <span className="text-gray-300">Client Name</span>}</p>
+          <p className="font-semibold mb-1">{data.clientName || <span className="text-gray-500">Client Name</span>}</p>
           <p className="text-gray-500 whitespace-pre-line"><MultilineText text={data.clientAddress} /></p>
           {data.senderAddress && (
-            <p className="text-gray-400 mt-2 whitespace-pre-line"><MultilineText text={data.senderAddress} /></p>
+            <p className="text-gray-600 mt-2 whitespace-pre-line"><MultilineText text={data.senderAddress} /></p>
           )}
         </div>
         <div className="text-right space-y-1 text-gray-500">
@@ -349,7 +349,7 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
       {/* Line items */}
       <table className="w-full mb-8 text-xs">
         <thead>
-          <tr className="text-gray-400 uppercase tracking-widest border-b border-gray-200">
+          <tr className="text-gray-600 uppercase tracking-widest border-b border-gray-200">
             <th className="text-left pb-2 font-normal">Description</th>
             <th className="text-right pb-2 font-normal w-12">Qty</th>
             <th className="text-right pb-2 font-normal w-24">Rate</th>
@@ -360,7 +360,7 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
           {data.lineItems.map((item) => (
             <tr key={item.id} className="border-b border-gray-100">
               <td className="py-2">
-                {item.description || <span className="text-gray-300 italic">—</span>}
+                {item.description || <span className="text-gray-500 italic">—</span>}
               </td>
               <td className="py-2 text-right text-gray-500">{item.quantity}</td>
               <td className="py-2 text-right text-gray-500 font-mono">{formatCurrency(item.unitPrice, sym)}</td>
@@ -398,7 +398,7 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
 
       {/* Footer */}
       {(data.paymentTerms || data.notes) && (
-        <div className="border-t border-gray-200 pt-4 text-xs text-gray-400 space-y-1">
+        <div className="border-t border-gray-200 pt-4 text-xs text-gray-600 space-y-1">
           {data.paymentTerms && <p>{data.paymentTerms}</p>}
           {data.notes && <p className="whitespace-pre-line">{data.notes}</p>}
         </div>

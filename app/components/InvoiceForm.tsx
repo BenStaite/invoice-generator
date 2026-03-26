@@ -327,7 +327,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 />
               </label>
             )}
-            <p className="text-xs text-gray-400">PNG, JPG or SVG. Max display width 800px.</p>
+            <p className="text-xs text-gray-500">PNG, JPG or SVG. Max display width 800px.</p>
           </div>
         </fieldset>
 
