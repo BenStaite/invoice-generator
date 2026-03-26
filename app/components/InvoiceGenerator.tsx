@@ -1,9 +1,38 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
+import { Button } from '@/components/ui/button'
+
+const DRAFT_KEY = 'ig:draft'
+
+function loadDraft(): InvoiceData | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as InvoiceData
+  } catch {
+    return null
+  }
+}
+
+function saveDraft(data: InvoiceData) {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data))
+  } catch {
+    // Silent fail (e.g. private browsing, storage quota)
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY)
+  } catch {
+    // Silent fail
+  }
+}
 
 export interface LineItem {
   id: string
@@ -84,13 +113,38 @@ export function calculateTotals(data: InvoiceData) {
 export { generateId }
 
 export default function InvoiceGenerator() {
-  const [data, setData] = useState<InvoiceData>(initialData)
+  const [data, setData] = useState<InvoiceData>(() => loadDraft() ?? initialData)
   const previewRef = useRef<HTMLDivElement>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleChange = useCallback((next: InvoiceData) => {
+    setData(next)
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => saveDraft(next), 1000)
+  }, [])
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    }
+  }, [])
+
+  const handleNewInvoice = useCallback(() => {
+    clearDraft()
+    setData({ ...initialData, invoiceDate: new Date().toISOString().split('T')[0] })
+  }, [])
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50">
-        <InvoiceForm data={data} onChange={setData} />
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">Invoice Details</h2>
+          <Button variant="outline" size="sm" onClick={handleNewInvoice}>
+            New Invoice
+          </Button>
+        </div>
+        <InvoiceForm data={data} onChange={handleChange} />
         <div className="mt-6">
           <DownloadPDFButton data={data} previewRef={previewRef} />
         </div>
