@@ -2,6 +2,7 @@ import type { NextAuthConfig } from 'next-auth'
 
 // Edge-safe auth config (no Node.js-only imports)
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   providers: [],
   session: { strategy: 'jwt' },
   pages: {
