@@ -96,6 +96,8 @@ const TEMPLATES = [
 export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   const sym = getCurrencySymbol(data.currency)
   const senderRestored = useRef(false)
+  const addButtonRef = useRef<HTMLButtonElement>(null)
+  const lineItemRefs = useRef<Map<string, HTMLInputElement>>(new Map())
 
   // Saved clients list (drives datalist)
   const [savedClients, setSavedClients] = useState<SavedClient[]>([])
@@ -144,20 +146,38 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   }
 
   function addLineItem() {
+    const newId = generateId()
     onChange({
       ...data,
       lineItems: [
         ...data.lineItems,
-        { id: generateId(), description: '', quantity: 1, unitPrice: 0 },
+        { id: newId, description: '', quantity: 1, unitPrice: 0 },
       ],
+    })
+    // Focus new row description on next render
+    requestAnimationFrame(() => {
+      lineItemRefs.current.get(newId)?.focus()
     })
   }
 
   function removeLineItem(id: string) {
     if (data.lineItems.length <= 1) return
+    const idx = data.lineItems.findIndex((item) => item.id === id)
     onChange({
       ...data,
       lineItems: data.lineItems.filter((item) => item.id !== id),
+    })
+    // Focus previous row description, or add button if first row removed
+    requestAnimationFrame(() => {
+      if (idx > 0) {
+        const prevId = data.lineItems[idx - 1].id
+        lineItemRefs.current.get(prevId)?.focus()
+      } else if (data.lineItems.length > 1) {
+        const nextId = data.lineItems[1].id
+        lineItemRefs.current.get(nextId)?.focus()
+      } else {
+        addButtonRef.current?.focus()
+      }
     })
   }
 
@@ -194,12 +214,12 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       {/* Template & Currency */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label>Template</Label>
+          <Label htmlFor="template-select">Template</Label>
           <Select
             value={data.template}
             onValueChange={(val) => update({ template: val as InvoiceData['template'] })}
           >
-            <SelectTrigger>
+            <SelectTrigger id="template-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -210,12 +230,12 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Currency</Label>
+          <Label htmlFor="currency-select">Currency</Label>
           <Select
             value={data.currency}
             onValueChange={(val) => update({ currency: val })}
           >
-            <SelectTrigger>
+            <SelectTrigger id="currency-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -232,16 +252,18 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
         <fieldset className="space-y-3">
           <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">From</legend>
           <div className="space-y-1.5">
-            <Label>Name / Company</Label>
+            <Label htmlFor="sender-name">Name / Company</Label>
             <Input
+              id="sender-name"
               value={data.senderName}
               onChange={(e) => update({ senderName: e.target.value })}
               placeholder="Your name or company"
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Address</Label>
+            <Label htmlFor="sender-address">Address</Label>
             <Textarea
+              id="sender-address"
               rows={3}
               value={data.senderAddress}
               onChange={(e) => update({ senderAddress: e.target.value })}
@@ -265,9 +287,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   size="sm"
                   onClick={() => update({ logo: null })}
                   className="h-7 px-2 text-xs gap-1 text-red-500 hover:text-red-700"
-                  title="Remove logo"
+                  aria-label="Remove business logo"
                 >
-                  <Cross2Icon className="w-3.5 h-3.5" />
+                  <Cross2Icon className="w-3.5 h-3.5" aria-hidden="true" />
                   Remove
                 </Button>
               </div>
@@ -281,7 +303,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   asChild
                 >
                   <span>
-                    <ImageIcon className="w-4 h-4" />
+                    <ImageIcon className="w-4 h-4" aria-hidden="true" />
                     Upload Logo
                   </span>
                 </Button>
@@ -289,6 +311,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   type="file"
                   accept="image/png,image/jpeg,image/svg+xml"
                   className="sr-only"
+                  aria-label="Upload business logo"
                   onChange={async (e) => {
                     const file = e.target.files?.[0]
                     if (!file) return
@@ -304,7 +327,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 />
               </label>
             )}
-            <p className="text-xs text-gray-400">PNG, JPG or SVG. Max display width 800px.</p>
+            <p className="text-xs text-gray-500">PNG, JPG or SVG. Max display width 800px.</p>
           </div>
         </fieldset>
 
@@ -317,9 +340,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
               size="sm"
               onClick={saveClient}
               className="h-7 px-2 text-xs gap-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-              title="Save this client for future invoices"
+              aria-label="Save this client for future invoices"
             >
-              <BookmarkIcon className="w-3.5 h-3.5" />
+              <BookmarkIcon className="w-3.5 h-3.5" aria-hidden="true" />
               Save client
             </Button>
           </div>
@@ -340,8 +363,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Client Address</Label>
+            <Label htmlFor="client-address">Client Address</Label>
             <Textarea
+              id="client-address"
               rows={3}
               value={data.clientAddress}
               onChange={(e) => update({ clientAddress: e.target.value })}
@@ -354,23 +378,26 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       {/* Invoice details */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-1.5">
-          <Label>Invoice Number</Label>
+          <Label htmlFor="invoice-number">Invoice Number</Label>
           <Input
+            id="invoice-number"
             value={data.invoiceNumber}
             onChange={(e) => update({ invoiceNumber: e.target.value })}
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Invoice Date</Label>
+          <Label htmlFor="invoice-date">Invoice Date</Label>
           <Input
+            id="invoice-date"
             type="date"
             value={data.invoiceDate}
             onChange={(e) => update({ invoiceDate: e.target.value })}
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Due Date</Label>
+          <Label htmlFor="due-date">Due Date</Label>
           <Input
+            id="due-date"
             type="date"
             value={data.dueDate}
             onChange={(e) => update({ dueDate: e.target.value })}
@@ -385,18 +412,23 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
-                <th className="pb-2 pr-2 font-medium">Description</th>
-                <th className="pb-2 pr-2 font-medium w-20">Qty</th>
-                <th className="pb-2 pr-2 font-medium w-28">Unit Price ({sym})</th>
-                <th className="pb-2 pr-2 font-medium w-24 text-right">Subtotal</th>
-                <th className="pb-2 w-10"></th>
+                <th className="pb-2 pr-2 font-medium" id="col-desc">Description</th>
+                <th className="pb-2 pr-2 font-medium w-20" id="col-qty">Qty</th>
+                <th className="pb-2 pr-2 font-medium w-28" id="col-price">Unit Price ({sym})</th>
+                <th className="pb-2 pr-2 font-medium w-24 text-right" id="col-subtotal">Subtotal</th>
+                <th className="pb-2 w-10"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody>
-              {data.lineItems.map((item) => (
+              {data.lineItems.map((item, idx) => (
                 <tr key={item.id} className="border-b border-gray-100 dark:border-gray-700">
                   <td className="py-2 pr-2">
                     <Input
+                      ref={(el) => {
+                        if (el) lineItemRefs.current.set(item.id, el)
+                        else lineItemRefs.current.delete(item.id)
+                      }}
+                      aria-label={`Line item ${idx + 1} description`}
                       value={item.description}
                       onChange={(e) =>
                         updateLineItem(item.id, { description: e.target.value })
@@ -410,6 +442,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                       type="number"
                       min={0}
                       step={1}
+                      aria-label={`Line item ${idx + 1} quantity`}
                       value={item.quantity}
                       onChange={(e) =>
                         updateLineItem(item.id, {
@@ -424,6 +457,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                       type="number"
                       min={0}
                       step={0.01}
+                      aria-label={`Line item ${idx + 1} unit price`}
                       value={item.unitPrice}
                       onChange={(e) =>
                         updateLineItem(item.id, {
@@ -441,9 +475,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                       onClick={() => removeLineItem(item.id)}
                       disabled={data.lineItems.length <= 1}
                       className="text-red-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed p-1"
-                      title="Remove row"
+                      aria-label={`Remove line item ${idx + 1}`}
                     >
-                      <MinusCircledIcon className="w-4 h-4" />
+                      <MinusCircledIcon className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </td>
                 </tr>
@@ -452,13 +486,14 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           </table>
         </div>
         <Button
+          ref={addButtonRef}
           type="button"
           variant="outline"
           size="sm"
           onClick={addLineItem}
           className="gap-1.5"
         >
-          <PlusIcon className="w-4 h-4" />
+          <PlusIcon className="w-4 h-4" aria-hidden="true" />
           Add Line Item
         </Button>
       </fieldset>
@@ -466,8 +501,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       {/* Tax, Discount, Totals */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label>Tax Rate (%)</Label>
+          <Label htmlFor="tax-rate">Tax Rate (%)</Label>
           <Input
+            id="tax-rate"
             type="number"
             min={0}
             step={0.01}
@@ -476,9 +512,10 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Discount</Label>
+          <Label htmlFor="discount-value">Discount</Label>
           <div className="flex gap-2">
             <Input
+              id="discount-value"
               className="flex-1"
               type="number"
               min={0}
@@ -494,7 +531,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 update({ discountType: val as 'flat' | 'percentage' })
               }
             >
-              <SelectTrigger className="w-28">
+              <SelectTrigger className="w-28" aria-label="Discount type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -516,16 +553,18 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
       {/* Payment terms & Notes */}
       <div className="space-y-1.5">
-        <Label>Payment Terms</Label>
+        <Label htmlFor="payment-terms">Payment Terms</Label>
         <Input
+          id="payment-terms"
           value={data.paymentTerms}
           onChange={(e) => update({ paymentTerms: e.target.value })}
           placeholder="e.g. Net 30"
         />
       </div>
       <div className="space-y-1.5">
-        <Label>Notes / Memo</Label>
+        <Label htmlFor="notes">Notes / Memo</Label>
         <Textarea
+          id="notes"
           rows={3}
           value={data.notes}
           onChange={(e) => update({ notes: e.target.value })}
