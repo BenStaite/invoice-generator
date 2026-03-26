@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { InvoiceData } from './InvoiceGenerator'
 import { Button } from '@/components/ui/button'
 import { DownloadIcon, UpdateIcon } from '@radix-ui/react-icons'
+import { setLastInvoiceNumber } from '@/lib/invoiceNumber'
 
 interface DownloadPDFButtonProps {
   data: InvoiceData
@@ -48,6 +49,7 @@ export default function DownloadPDFButton({ data, previewRef, onValidate }: Down
       const invoiceNum = sanitizeFilename(data.invoiceNumber || 'invoice')
       const clientName = sanitizeFilename(data.clientName || 'client')
       pdf.save(`invoice-${invoiceNum}-${clientName}.pdf`)
+      setLastInvoiceNumber(data.invoiceNumber)
     } catch (err) {
       console.error('PDF generation failed:', err)
       alert('PDF generation failed. Please try again.')

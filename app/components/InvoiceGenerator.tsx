@@ -5,6 +5,7 @@ import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
 import { Button } from '@/components/ui/button'
+import { getDefaultInvoiceNumber } from '@/lib/invoiceNumber'
 
 const DRAFT_KEY = 'ig:draft'
 
@@ -184,7 +185,11 @@ export default function InvoiceGenerator() {
   const handleNewInvoice = useCallback(() => {
     clearDraft()
     setErrors({})
-    setData({ ...initialData, invoiceDate: new Date().toISOString().split('T')[0] })
+    setData({
+      ...initialData,
+      invoiceDate: new Date().toISOString().split('T')[0],
+      invoiceNumber: getDefaultInvoiceNumber(),
+    })
   }, [])
 
   return (
