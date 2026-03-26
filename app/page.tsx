@@ -60,7 +60,7 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Hero */}
         <section className="py-24 px-4 text-center">
           <div className="max-w-3xl mx-auto">
@@ -68,7 +68,7 @@ export default function LandingPage() {
               <CheckIcon className="w-4 h-4" />
               Free &amp; No Signup Required
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-5 leading-tight">
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-5 leading-tight">
               Create Professional Invoices Instantly
             </h1>
             <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
@@ -85,9 +85,9 @@ export default function LandingPage() {
         </section>
 
         {/* Features */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4 bg-white dark:bg-gray-800">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-12">
               Everything you need, nothing you don&apos;t
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -96,7 +96,7 @@ export default function LandingPage() {
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
                     <DownloadIcon className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Instant PDF</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Instant PDF</h3>
                   <p className="text-gray-500 text-sm">
                     Generate a professional PDF invoice in one click.
                   </p>
@@ -107,7 +107,7 @@ export default function LandingPage() {
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
                     <LockOpen1Icon className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">No Signup</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">No Signup</h3>
                   <p className="text-gray-500 text-sm">
                     No account needed. Just fill in your details and download.
                   </p>
@@ -118,7 +118,7 @@ export default function LandingPage() {
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
                     <FileTextIcon className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Professional</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Professional</h3>
                   <p className="text-gray-500 text-sm">
                     Clean, professional templates trusted by freelancers.
                   </p>
@@ -131,7 +131,7 @@ export default function LandingPage() {
         {/* CTA */}
         <section className="py-20 px-4 text-center">
           <div className="max-w-xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Ready to send your first invoice?
             </h2>
             <Button asChild size="lg" className="text-base px-8 py-6 rounded-xl shadow-md">
@@ -143,7 +143,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <footer className="py-8 text-center text-gray-400 text-sm border-t border-gray-100">
+        <footer className="py-8 text-center text-gray-400 text-sm border-t border-gray-100 dark:border-gray-700">
           Free Invoice Generator — No signup required
         </footer>
       </main>

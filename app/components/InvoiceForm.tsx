@@ -156,7 +156,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Invoice Generator</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Invoice Generator</h1>
 
       {/* Template & Currency */}
       <div className="grid grid-cols-2 gap-4">
@@ -197,7 +197,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       {/* Sender & Client */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold text-gray-800 mb-1">From</legend>
+          <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">From</legend>
           <div className="space-y-1.5">
             <Label>Name / Company</Label>
             <Input
@@ -219,13 +219,13 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
         <fieldset className="space-y-3">
           <div className="flex items-center justify-between mb-1">
-            <legend className="text-sm font-semibold text-gray-800">Bill To</legend>
+            <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200">Bill To</legend>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={saveClient}
-              className="h-7 px-2 text-xs gap-1 text-gray-500 hover:text-gray-900"
+              className="h-7 px-2 text-xs gap-1 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
               title="Save this client for future invoices"
             >
               <BookmarkIcon className="w-3.5 h-3.5" />
@@ -289,11 +289,11 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
       {/* Line items */}
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold text-gray-800">Line Items</legend>
+        <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200">Line Items</legend>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-600 border-b">
+              <tr className="text-left text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
                 <th className="pb-2 pr-2 font-medium">Description</th>
                 <th className="pb-2 pr-2 font-medium w-20">Qty</th>
                 <th className="pb-2 pr-2 font-medium w-28">Unit Price ({sym})</th>
@@ -303,7 +303,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
             </thead>
             <tbody>
               {data.lineItems.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100">
+                <tr key={item.id} className="border-b border-gray-100 dark:border-gray-700">
                   <td className="py-2 pr-2">
                     <Input
                       value={item.description}
@@ -341,7 +341,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                       }
                     />
                   </td>
-                  <td className="py-2 pr-2 text-right font-mono text-gray-700">
+                  <td className="py-2 pr-2 text-right font-mono text-gray-700 dark:text-gray-300">
                     {sym}{(item.quantity * item.unitPrice).toFixed(2)}
                   </td>
                   <td className="py-2">
@@ -416,9 +416,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       </div>
 
       {/* Summary */}
-      <div className="text-sm text-right space-y-1 border-t pt-3 text-gray-700">
+      <div className="text-sm text-right space-y-1 border-t dark:border-gray-700 pt-3 text-gray-700 dark:text-gray-300">
         <p>Subtotal: <span className="font-mono">{sym}{subtotal.toFixed(2)}</span></p>
-        <p className="font-semibold text-base text-gray-900">
+        <p className="font-semibold text-base text-gray-900 dark:text-gray-100">
           Total: <span className="font-mono">{sym}{total.toFixed(2)}</span>
         </p>
       </div>
