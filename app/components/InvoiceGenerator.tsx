@@ -89,18 +89,18 @@ export default function InvoiceGenerator() {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
-      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50">
+      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50 dark:bg-gray-900">
         <InvoiceForm data={data} onChange={setData} />
         <div className="mt-6">
           <DownloadPDFButton data={data} previewRef={previewRef} />
         </div>
       </div>
-      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200">
+      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200 dark:bg-gray-800">
         <div className="sticky top-0">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Live Preview
           </p>
-          <div ref={previewRef}>
+          <div ref={previewRef} className="bg-white text-gray-900">
             <InvoicePreview data={data} />
           </div>
         </div>
