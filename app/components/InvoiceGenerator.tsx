@@ -97,9 +97,9 @@ export default function InvoiceGenerator() {
       </div>
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200">
         <div className="sticky top-0">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Live Preview
-          </h2>
+          </p>
           <div ref={previewRef}>
             <InvoicePreview data={data} />
           </div>
