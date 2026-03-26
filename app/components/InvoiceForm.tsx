@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
 import { type InvoiceData, type LineItem, generateId, calculateTotals, CURRENCIES, getCurrencySymbol } from './InvoiceGenerator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +13,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { PlusIcon, MinusCircledIcon } from '@radix-ui/react-icons'
+import { PlusIcon, MinusCircledIcon, BookmarkIcon } from '@radix-ui/react-icons'
+
+// ── localStorage helpers ─────────────────────────────────────────────────────
+
+const LS_SENDER = 'ig:sender-details'
+const LS_CLIENTS = 'ig:client-details'
+
+interface SavedClient {
+  name: string
+  address: string
+}
+
+interface SenderDetails {
+  senderName: string
+  senderAddress: string
+}
+
+function lsGet<T>(key: string): T | null {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : null
+  } catch {
+    return null
+  }
+}
+
+function lsSet(key: string, value: unknown): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch {
+    // fail silently (e.g. private browsing, storage full)
+  }
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
 
 interface InvoiceFormProps {
   data: InvoiceData
@@ -25,9 +62,43 @@ const TEMPLATES = [
 
 export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   const sym = getCurrencySymbol(data.currency)
+  const senderRestored = useRef(false)
+
+  // Saved clients list (drives datalist)
+  const [savedClients, setSavedClients] = useState<SavedClient[]>([])
+
+  // Restore saved clients list on mount
+  useEffect(() => {
+    const clients = lsGet<SavedClient[]>(LS_CLIENTS)
+    if (clients) setSavedClients(clients)
+  }, [])
+
+  // Restore sender details once on mount
+  useEffect(() => {
+    if (senderRestored.current) return
+    senderRestored.current = true
+    const sender = lsGet<SenderDetails>(LS_SENDER)
+    if (sender) {
+      onChange({
+        ...data,
+        senderName: sender.senderName || data.senderName,
+        senderAddress: sender.senderAddress || data.senderAddress,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function update(patch: Partial<InvoiceData>) {
-    onChange({ ...data, ...patch })
+    const next = { ...data, ...patch }
+    onChange(next)
+
+    // Auto-save sender details whenever they change
+    if ('senderName' in patch || 'senderAddress' in patch) {
+      lsSet(LS_SENDER, {
+        senderName: next.senderName,
+        senderAddress: next.senderAddress,
+      })
+    }
   }
 
   function updateLineItem(id: string, patch: Partial<LineItem>) {
@@ -57,7 +128,31 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
     })
   }
 
+  function saveClient() {
+    const name = data.clientName.trim()
+    const address = data.clientAddress.trim()
+    if (!name) return
+
+    const existing = lsGet<SavedClient[]>(LS_CLIENTS) ?? []
+    // Update if already saved, otherwise prepend
+    const filtered = existing.filter((c) => c.name !== name)
+    const updated = [{ name, address }, ...filtered]
+    lsSet(LS_CLIENTS, updated)
+    setSavedClients(updated)
+  }
+
+  function onClientNameChange(value: string) {
+    update({ clientName: value })
+    // Auto-fill address if this matches a saved client exactly
+    const match = savedClients.find((c) => c.name === value)
+    if (match) {
+      onChange({ ...data, clientName: value, clientAddress: match.address })
+    }
+  }
+
   const { subtotal, total } = calculateTotals(data)
+
+  const datalistId = 'ig-saved-clients'
 
   return (
     <div className="space-y-6">
@@ -123,12 +218,33 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
         </fieldset>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-semibold text-gray-800 mb-1">Bill To</legend>
+          <div className="flex items-center justify-between mb-1">
+            <legend className="text-sm font-semibold text-gray-800">Bill To</legend>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={saveClient}
+              className="h-7 px-2 text-xs gap-1 text-gray-500 hover:text-gray-900"
+              title="Save this client for future invoices"
+            >
+              <BookmarkIcon className="w-3.5 h-3.5" />
+              Save client
+            </Button>
+          </div>
           <div className="space-y-1.5">
-            <Label>Client Name</Label>
+            <Label htmlFor="client-name-input">Client Name</Label>
+            {/* datalist for browser-native autocomplete */}
+            <datalist id={datalistId}>
+              {savedClients.map((c) => (
+                <option key={c.name} value={c.name} />
+              ))}
+            </datalist>
             <Input
+              id="client-name-input"
+              list={datalistId}
               value={data.clientName}
-              onChange={(e) => update({ clientName: e.target.value })}
+              onChange={(e) => onClientNameChange(e.target.value)}
               placeholder="Client name"
             />
           </div>
