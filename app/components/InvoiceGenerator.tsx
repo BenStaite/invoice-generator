@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTheme } from 'next-themes'
 import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
@@ -125,6 +126,7 @@ export interface ValidationErrors {
 }
 
 export default function InvoiceGenerator() {
+  const { theme, setTheme } = useTheme()
   const [data, setData] = useState<InvoiceData>(() => loadDraft() ?? initialData)
   const [errors, setErrors] = useState<ValidationErrors>({})
   const previewRef = useRef<HTMLDivElement>(null)
@@ -197,9 +199,19 @@ export default function InvoiceGenerator() {
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50 dark:bg-gray-900">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Invoice Details</h2>
-          <Button variant="outline" size="sm" onClick={handleNewInvoice}>
-            New Invoice
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label="Toggle dark mode"
+            >
+              {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleNewInvoice}>
+              New Invoice
+            </Button>
+          </div>
         </div>
         <InvoiceForm data={data} onChange={handleChange} errors={errors} clearError={clearError} />
         <div className="mt-6 flex gap-2">
