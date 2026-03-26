@@ -30,7 +30,7 @@ function MultilineText({ text }: { text: string }) {
 
 // ─── Classic Template ────────────────────────────────────────────────────────
 function ClassicTemplate({ data }: InvoicePreviewProps) {
-  const { subtotal, discount, tax, total } = calculateTotals(data)
+  const { subtotal, discount, afterDiscount, tax, total } = calculateTotals(data)
   const hasDiscount = data.discountValue > 0
   const sym = getCurrencySymbol(data.currency)
 
@@ -102,7 +102,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
             <th className="text-left py-2 font-semibold">Description</th>
             <th className="text-right py-2 font-semibold w-16">Qty</th>
             <th className="text-right py-2 font-semibold w-24">Unit Price</th>
-            <th className="text-right py-2 font-semibold w-24">Amount</th>
+            <th className="text-right py-2 font-semibold w-24">Line Total</th>
           </tr>
         </thead>
         <tbody>
@@ -133,15 +133,21 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
             <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
           </div>
           {hasDiscount && (
-            <div className="flex justify-between py-1 text-red-600">
-              <span>
-                Discount
-                {data.discountType === 'percentage'
-                  ? ` (${data.discountValue}%)`
-                  : ''}
-              </span>
-              <span className="font-mono">-{formatCurrency(discount, sym)}</span>
-            </div>
+            <>
+              <div className="flex justify-between py-1 text-red-600">
+                <span>
+                  Discount
+                  {data.discountType === 'percentage'
+                    ? ` (${data.discountValue}%)`
+                    : ''}
+                </span>
+                <span className="font-mono">-{formatCurrency(discount, sym)}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-gray-500">After Discount</span>
+                <span className="font-mono">{formatCurrency(afterDiscount, sym)}</span>
+              </div>
+            </>
           )}
           {data.taxRate > 0 && (
             <div className="flex justify-between py-1">
@@ -183,7 +189,7 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
 
 // ─── Modern Template ─────────────────────────────────────────────────────────
 function ModernTemplate({ data }: InvoicePreviewProps) {
-  const { subtotal, discount, tax, total } = calculateTotals(data)
+  const { subtotal, discount, afterDiscount, tax, total } = calculateTotals(data)
   const hasDiscount = data.discountValue > 0
   const sym = getCurrencySymbol(data.currency)
   const accent = '#2563eb' // blue-600
@@ -243,7 +249,7 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
               <th className="text-left py-2 font-bold text-gray-600">Description</th>
               <th className="text-right py-2 font-bold text-gray-600 w-16">Qty</th>
               <th className="text-right py-2 font-bold text-gray-600 w-24">Unit Price</th>
-              <th className="text-right py-2 font-bold text-gray-600 w-24">Amount</th>
+              <th className="text-right py-2 font-bold text-gray-600 w-24">Line Total</th>
             </tr>
           </thead>
           <tbody>
@@ -268,10 +274,16 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
               <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
             </div>
             {hasDiscount && (
-              <div className="flex justify-between py-1 text-red-500">
-                <span>Discount{data.discountType === 'percentage' ? ` (${data.discountValue}%)` : ''}</span>
-                <span className="font-mono">-{formatCurrency(discount, sym)}</span>
-              </div>
+              <>
+                <div className="flex justify-between py-1 text-red-500">
+                  <span>Discount{data.discountType === 'percentage' ? ` (${data.discountValue}%)` : ''}</span>
+                  <span className="font-mono">-{formatCurrency(discount, sym)}</span>
+                </div>
+                <div className="flex justify-between py-1 text-gray-500">
+                  <span>After Discount</span>
+                  <span className="font-mono">{formatCurrency(afterDiscount, sym)}</span>
+                </div>
+              </>
             )}
             {data.taxRate > 0 && (
               <div className="flex justify-between py-1 text-gray-500">
@@ -307,7 +319,7 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
 
 // ─── Minimal Template ────────────────────────────────────────────────────────
 function MinimalTemplate({ data }: InvoicePreviewProps) {
-  const { subtotal, discount, tax, total } = calculateTotals(data)
+  const { subtotal, discount, afterDiscount, tax, total } = calculateTotals(data)
   const hasDiscount = data.discountValue > 0
   const sym = getCurrencySymbol(data.currency)
 
@@ -352,8 +364,8 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
           <tr className="text-gray-600 uppercase tracking-widest border-b border-gray-200">
             <th className="text-left pb-2 font-normal">Description</th>
             <th className="text-right pb-2 font-normal w-12">Qty</th>
-            <th className="text-right pb-2 font-normal w-24">Rate</th>
-            <th className="text-right pb-2 font-normal w-24">Amount</th>
+            <th className="text-right pb-2 font-normal w-24">Unit Price</th>
+            <th className="text-right pb-2 font-normal w-24">Line Total</th>
           </tr>
         </thead>
         <tbody>
@@ -378,10 +390,16 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
             <span className="font-mono">{formatCurrency(subtotal, sym)}</span>
           </div>
           {hasDiscount && (
-            <div className="flex justify-between text-red-500">
-              <span>Discount</span>
-              <span className="font-mono">-{formatCurrency(discount, sym)}</span>
-            </div>
+            <>
+              <div className="flex justify-between text-red-500">
+                <span>Discount{data.discountType === 'percentage' ? ` (${data.discountValue}%)` : ''}</span>
+                <span className="font-mono">-{formatCurrency(discount, sym)}</span>
+              </div>
+              <div className="flex justify-between text-gray-500">
+                <span>After Discount</span>
+                <span className="font-mono">{formatCurrency(afterDiscount, sym)}</span>
+              </div>
+            </>
           )}
           {data.taxRate > 0 && (
             <div className="flex justify-between text-gray-500">
