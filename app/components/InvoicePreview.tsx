@@ -39,6 +39,10 @@ function ClassicTemplate({ data }: InvoicePreviewProps) {
       {/* Header */}
       <div className="flex justify-between items-start mb-10">
         <div>
+          {data.logo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.logo} alt="Logo" className="max-h-14 max-w-[160px] object-contain mb-2" />
+          )}
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
             {data.senderName || <span className="text-gray-300">Your Name</span>}
           </h2>
@@ -190,6 +194,10 @@ function ModernTemplate({ data }: InvoicePreviewProps) {
       <div style={{ backgroundColor: accent }} className="px-8 py-6 text-white">
         <div className="flex justify-between items-start">
           <div>
+            {data.logo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={data.logo} alt="Logo" className="max-h-12 max-w-[140px] object-contain mb-2 brightness-0 invert" />
+            )}
             <p className="text-2xl font-extrabold tracking-tight">
               {data.senderName || <span className="opacity-50">Your Name</span>}
             </p>
@@ -306,10 +314,16 @@ function MinimalTemplate({ data }: InvoicePreviewProps) {
   return (
     <div className="bg-white shadow-lg max-w-[640px] mx-auto text-gray-800 text-sm leading-relaxed" style={{ fontFamily: 'Georgia, serif', padding: '3rem' }}>
       {/* Top row */}
-      <div className="flex justify-between items-baseline mb-12">
-        <p className="text-lg font-bold tracking-tight">
-          {data.senderName || <span className="text-gray-300">Your Name</span>}
-        </p>
+      <div className="flex justify-between items-start mb-12">
+        <div>
+          {data.logo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.logo} alt="Logo" className="max-h-12 max-w-[140px] object-contain mb-2" />
+          )}
+          <p className="text-lg font-bold tracking-tight">
+            {data.senderName || <span className="text-gray-300">Your Name</span>}
+          </p>
+        </div>
         <p className="text-4xl font-light tracking-[0.2em] uppercase text-gray-400">Invoice</p>
       </div>
 
