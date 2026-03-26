@@ -164,7 +164,7 @@ export default function InvoiceGenerator() {
         const itemErr: { description?: string; quantity?: string; unitPrice?: string } = {}
         if (!item.description.trim()) itemErr.description = 'Description is required.'
         if (!item.quantity || item.quantity <= 0) itemErr.quantity = 'Must be > 0.'
-        if (item.unitPrice < 0) itemErr.unitPrice = 'Must be ≥ 0.'
+        if (!item.unitPrice || item.unitPrice <= 0) itemErr.unitPrice = 'Must be > 0.'
         if (Object.keys(itemErr).length > 0) liErrors[item.id] = itemErr
       }
       if (Object.keys(liErrors).length > 0) newErrors.lineItems = liErrors
