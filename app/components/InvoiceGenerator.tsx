@@ -147,8 +147,11 @@ export default function InvoiceGenerator() {
           </Button>
         </div>
         <InvoiceForm data={data} onChange={handleChange} />
-        <div className="mt-6">
+        <div className="mt-6 flex gap-2">
           <DownloadPDFButton data={data} previewRef={previewRef} />
+          <Button variant="outline" onClick={() => window.print()}>
+            Print
+          </Button>
         </div>
       </div>
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200 dark:bg-gray-800">
@@ -156,7 +159,7 @@ export default function InvoiceGenerator() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Live Preview
           </p>
-          <div ref={previewRef} className="bg-white text-gray-900">
+          <div ref={previewRef} id="invoice-preview" className="bg-white text-gray-900">
             <InvoicePreview data={data} />
           </div>
         </div>
