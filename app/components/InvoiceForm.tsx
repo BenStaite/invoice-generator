@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { PlusIcon, MinusCircledIcon, BookmarkIcon } from '@radix-ui/react-icons'
+import { PlusIcon, MinusCircledIcon, BookmarkIcon, ImageIcon, Cross2Icon } from '@radix-ui/react-icons'
 
 // ── localStorage helpers ─────────────────────────────────────────────────────
 
@@ -45,6 +45,39 @@ function lsSet(key: string, value: unknown): void {
   } catch {
     // fail silently (e.g. private browsing, storage full)
   }
+}
+
+// ── Logo helpers ─────────────────────────────────────────────────────────────
+
+const MAX_LOGO_WIDTH = 800
+
+function resizeImageToDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataURL = e.target?.result as string
+      const img = new Image()
+      img.onload = () => {
+        if (img.width <= MAX_LOGO_WIDTH) {
+          resolve(dataURL)
+          return
+        }
+        const scale = MAX_LOGO_WIDTH / img.width
+        const canvas = document.createElement('canvas')
+        canvas.width = MAX_LOGO_WIDTH
+        canvas.height = Math.round(img.height * scale)
+        const ctx = canvas.getContext('2d')
+        if (!ctx) { resolve(dataURL); return }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        // SVGs should stay as-is; this branch only runs for raster
+        resolve(canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.9))
+      }
+      img.onerror = () => resolve(dataURL)
+      img.src = dataURL
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -214,6 +247,64 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
               onChange={(e) => update({ senderAddress: e.target.value })}
               placeholder="Street, City, State, ZIP"
             />
+          </div>
+          {/* Logo upload */}
+          <div className="space-y-1.5">
+            <Label>Logo</Label>
+            {data.logo ? (
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={data.logo}
+                  alt="Business logo"
+                  className="max-h-12 max-w-[120px] object-contain rounded border border-gray-200 dark:border-gray-700 bg-white p-1"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => update({ logo: null })}
+                  className="h-7 px-2 text-xs gap-1 text-red-500 hover:text-red-700"
+                  title="Remove logo"
+                >
+                  <Cross2Icon className="w-3.5 h-3.5" />
+                  Remove
+                </Button>
+              </div>
+            ) : (
+              <label className="flex items-center gap-2 cursor-pointer w-fit">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 pointer-events-none"
+                  asChild
+                >
+                  <span>
+                    <ImageIcon className="w-4 h-4" />
+                    Upload Logo
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/svg+xml"
+                  className="sr-only"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    try {
+                      const dataURL = await resizeImageToDataURL(file)
+                      update({ logo: dataURL })
+                    } catch {
+                      // Fail silently — user can try again
+                    }
+                    // Reset input so same file can be re-uploaded
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+            )}
+            <p className="text-xs text-gray-400">PNG, JPG or SVG. Max display width 800px.</p>
           </div>
         </fieldset>
 

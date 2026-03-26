@@ -57,6 +57,7 @@ export interface InvoiceData {
   notes: string
   currency: string
   template: 'classic' | 'modern' | 'minimal'
+  logo: string | null
 }
 
 export const CURRENCIES: Record<string, { symbol: string; label: string }> = {
@@ -93,6 +94,7 @@ const initialData: InvoiceData = {
   notes: '',
   currency: 'USD',
   template: 'classic',
+  logo: null,
 }
 
 export function calculateTotals(data: InvoiceData) {
