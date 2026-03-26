@@ -82,3 +82,42 @@ body {
   color: hsl(var(--foreground));
   font-family: Arial, Helvetica, sans-serif;
 }
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the invoice preview and its children */
+  #invoice-preview,
+  #invoice-preview * {
+    visibility: visible;
+  }
+
+  /* Position the invoice at top-left */
+  #invoice-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Prevent page breaks inside table rows */
+  tr, td, th {
+    page-break-inside: avoid;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
