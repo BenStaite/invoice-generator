@@ -114,8 +114,18 @@ export function calculateTotals(data: InvoiceData) {
 
 export { generateId }
 
+export interface ValidationErrors {
+  invoiceNumber?: string
+  invoiceDate?: string
+  senderName?: string
+  clientName?: string
+  lineItemsGeneral?: string
+  lineItems?: Record<string, { description?: string; quantity?: string; unitPrice?: string }>
+}
+
 export default function InvoiceGenerator() {
   const [data, setData] = useState<InvoiceData>(() => loadDraft() ?? initialData)
+  const [errors, setErrors] = useState<ValidationErrors>({})
   const previewRef = useRef<HTMLDivElement>(null)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -123,6 +133,45 @@ export default function InvoiceGenerator() {
     setData(next)
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => saveDraft(next), 1000)
+  }, [])
+
+  const clearError = useCallback((field: string, lineItemId?: string) => {
+    setErrors((prev) => {
+      if (lineItemId) {
+        const liErrors = prev.lineItems ? { ...prev.lineItems } : {}
+        if (liErrors[lineItemId]) {
+          liErrors[lineItemId] = { ...liErrors[lineItemId], [field]: undefined }
+        }
+        return { ...prev, lineItems: liErrors }
+      }
+      return { ...prev, [field]: undefined }
+    })
+  }, [])
+
+  const validateForm = useCallback((currentData: InvoiceData): boolean => {
+    const newErrors: ValidationErrors = {}
+
+    if (!currentData.invoiceNumber.trim()) newErrors.invoiceNumber = 'Invoice number is required.'
+    if (!currentData.invoiceDate.trim()) newErrors.invoiceDate = 'Issue date is required.'
+    if (!currentData.senderName.trim()) newErrors.senderName = 'Your name or business name is required.'
+    if (!currentData.clientName.trim()) newErrors.clientName = 'Client name is required.'
+
+    if (currentData.lineItems.length === 0) {
+      newErrors.lineItemsGeneral = 'At least one line item is required.'
+    } else {
+      const liErrors: ValidationErrors['lineItems'] = {}
+      for (const item of currentData.lineItems) {
+        const itemErr: { description?: string; quantity?: string; unitPrice?: string } = {}
+        if (!item.description.trim()) itemErr.description = 'Description is required.'
+        if (!item.quantity || item.quantity <= 0) itemErr.quantity = 'Must be > 0.'
+        if (item.unitPrice < 0) itemErr.unitPrice = 'Must be ≥ 0.'
+        if (Object.keys(itemErr).length > 0) liErrors[item.id] = itemErr
+      }
+      if (Object.keys(liErrors).length > 0) newErrors.lineItems = liErrors
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0 && !newErrors.lineItems
   }, [])
 
   // Cleanup timer on unmount
@@ -134,6 +183,7 @@ export default function InvoiceGenerator() {
 
   const handleNewInvoice = useCallback(() => {
     clearDraft()
+    setErrors({})
     setData({ ...initialData, invoiceDate: new Date().toISOString().split('T')[0] })
   }, [])
 
@@ -146,9 +196,9 @@ export default function InvoiceGenerator() {
             New Invoice
           </Button>
         </div>
-        <InvoiceForm data={data} onChange={handleChange} />
+        <InvoiceForm data={data} onChange={handleChange} errors={errors} clearError={clearError} />
         <div className="mt-6 flex gap-2">
-          <DownloadPDFButton data={data} previewRef={previewRef} />
+          <DownloadPDFButton data={data} previewRef={previewRef} onValidate={() => validateForm(data)} />
           <Button variant="outline" onClick={() => window.print()}>
             Print
           </Button>
