@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { type InvoiceData, type LineItem, generateId, calculateTotals, CURRENCIES, getCurrencySymbol } from './InvoiceGenerator'
+import { type InvoiceData, type LineItem, type ValidationErrors, generateId, calculateTotals, CURRENCIES, getCurrencySymbol } from './InvoiceGenerator'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -85,6 +85,8 @@ function resizeImageToDataURL(file: File): Promise<string> {
 interface InvoiceFormProps {
   data: InvoiceData
   onChange: (data: InvoiceData) => void
+  errors?: ValidationErrors
+  clearError?: (field: string, lineItemId?: string) => void
 }
 
 const TEMPLATES = [
@@ -93,7 +95,7 @@ const TEMPLATES = [
   { value: 'minimal', label: 'Minimal' },
 ]
 
-export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
+export default function InvoiceForm({ data, onChange, errors = {}, clearError }: InvoiceFormProps) {
   const sym = getCurrencySymbol(data.currency)
   const senderRestored = useRef(false)
   const addButtonRef = useRef<HTMLButtonElement>(null)
@@ -256,9 +258,11 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
             <Input
               id="sender-name"
               value={data.senderName}
-              onChange={(e) => update({ senderName: e.target.value })}
+              onChange={(e) => { update({ senderName: e.target.value }); clearError?.('senderName') }}
               placeholder="Your name or company"
+              className={errors.senderName ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.senderName && <p className="text-red-500 text-sm mt-1">{errors.senderName}</p>}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="sender-address">Address</Label>
@@ -358,9 +362,11 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
               id="client-name-input"
               list={datalistId}
               value={data.clientName}
-              onChange={(e) => onClientNameChange(e.target.value)}
+              onChange={(e) => { onClientNameChange(e.target.value); clearError?.('clientName') }}
               placeholder="Client name"
+              className={errors.clientName ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.clientName && <p className="text-red-500 text-sm mt-1">{errors.clientName}</p>}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="client-address">Client Address</Label>
@@ -382,8 +388,10 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           <Input
             id="invoice-number"
             value={data.invoiceNumber}
-            onChange={(e) => update({ invoiceNumber: e.target.value })}
+            onChange={(e) => { update({ invoiceNumber: e.target.value }); clearError?.('invoiceNumber') }}
+            className={errors.invoiceNumber ? 'border-red-500 focus-visible:ring-red-500' : ''}
           />
+          {errors.invoiceNumber && <p className="text-red-500 text-sm mt-1">{errors.invoiceNumber}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="invoice-date">Invoice Date</Label>
@@ -391,8 +399,10 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
             id="invoice-date"
             type="date"
             value={data.invoiceDate}
-            onChange={(e) => update({ invoiceDate: e.target.value })}
+            onChange={(e) => { update({ invoiceDate: e.target.value }); clearError?.('invoiceDate') }}
+            className={errors.invoiceDate ? 'border-red-500 focus-visible:ring-red-500' : ''}
           />
+          {errors.invoiceDate && <p className="text-red-500 text-sm mt-1">{errors.invoiceDate}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="due-date">Due Date</Label>
@@ -408,6 +418,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
       {/* Line items */}
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold text-gray-800 dark:text-gray-200">Line Items</legend>
+        {errors.lineItemsGeneral && <p className="text-red-500 text-sm">{errors.lineItemsGeneral}</p>}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -420,7 +431,9 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
               </tr>
             </thead>
             <tbody>
-              {data.lineItems.map((item, idx) => (
+              {data.lineItems.map((item, idx) => {
+                const itemErrors = errors.lineItems?.[item.id]
+                return (
                 <tr key={item.id} className="border-b border-gray-100 dark:border-gray-700">
                   <td className="py-2 pr-2">
                     <Input
@@ -430,41 +443,44 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                       }}
                       aria-label={`Line item ${idx + 1} description`}
                       value={item.description}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         updateLineItem(item.id, { description: e.target.value })
-                      }
+                        clearError?.('description', item.id)
+                      }}
                       placeholder="Item description"
+                      className={itemErrors?.description ? 'border-red-500 focus-visible:ring-red-500' : ''}
                     />
+                    {itemErrors?.description && <p className="text-red-500 text-xs mt-0.5">{itemErrors.description}</p>}
                   </td>
                   <td className="py-2 pr-2">
                     <Input
-                      className="text-right"
+                      className={`text-right${itemErrors?.quantity ? ' border-red-500 focus-visible:ring-red-500' : ''}`}
                       type="number"
                       min={0}
                       step={1}
                       aria-label={`Line item ${idx + 1} quantity`}
                       value={item.quantity}
-                      onChange={(e) =>
-                        updateLineItem(item.id, {
-                          quantity: parseFloat(e.target.value) || 0,
-                        })
-                      }
+                      onChange={(e) => {
+                        updateLineItem(item.id, { quantity: parseFloat(e.target.value) || 0 })
+                        clearError?.('quantity', item.id)
+                      }}
                     />
+                    {itemErrors?.quantity && <p className="text-red-500 text-xs mt-0.5">{itemErrors.quantity}</p>}
                   </td>
                   <td className="py-2 pr-2">
                     <Input
-                      className="text-right"
+                      className={`text-right${itemErrors?.unitPrice ? ' border-red-500 focus-visible:ring-red-500' : ''}`}
                       type="number"
                       min={0}
                       step={0.01}
                       aria-label={`Line item ${idx + 1} unit price`}
                       value={item.unitPrice}
-                      onChange={(e) =>
-                        updateLineItem(item.id, {
-                          unitPrice: parseFloat(e.target.value) || 0,
-                        })
-                      }
+                      onChange={(e) => {
+                        updateLineItem(item.id, { unitPrice: parseFloat(e.target.value) || 0 })
+                        clearError?.('unitPrice', item.id)
+                      }}
                     />
+                    {itemErrors?.unitPrice && <p className="text-red-500 text-xs mt-0.5">{itemErrors.unitPrice}</p>}
                   </td>
                   <td className="py-2 pr-2 text-right font-mono text-gray-700 dark:text-gray-300">
                     {sym}{(item.quantity * item.unitPrice).toFixed(2)}
@@ -481,7 +497,7 @@ export default function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

@@ -8,16 +8,18 @@ import { DownloadIcon, UpdateIcon } from '@radix-ui/react-icons'
 interface DownloadPDFButtonProps {
   data: InvoiceData
   previewRef: React.RefObject<HTMLDivElement | null>
+  onValidate?: () => boolean
 }
 
 function sanitizeFilename(s: string): string {
   return s.replace(/[^a-z0-9]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase()
 }
 
-export default function DownloadPDFButton({ data, previewRef }: DownloadPDFButtonProps) {
+export default function DownloadPDFButton({ data, previewRef, onValidate }: DownloadPDFButtonProps) {
   const [loading, setLoading] = useState(false)
 
   const handleDownload = async () => {
+    if (onValidate && !onValidate()) return
     if (!previewRef.current) return
     setLoading(true)
     try {
