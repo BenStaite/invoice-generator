@@ -1,6 +1,6 @@
 import { getInvoiceByShareToken } from '@/lib/invoices-db'
 import type { InvoiceData } from '@/app/components/InvoiceGenerator'
-import InvoicePreview from '@/app/components/InvoicePreview'
+import SharedInvoiceView from './SharedInvoiceView'
 import PrintButton from './PrintButton'
 
 export default async function SharePage({
@@ -54,7 +54,7 @@ export default async function SharePage({
 
       {/* Invoice preview */}
       <div className="print:bg-white print:shadow-none">
-        <InvoicePreview data={invoiceData} />
+        <SharedInvoiceView data={invoiceData} />
       </div>
 
       <div className="max-w-[700px] mx-auto mt-6 text-center text-xs text-gray-400 print:hidden">
