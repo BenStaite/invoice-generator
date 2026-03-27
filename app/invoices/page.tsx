@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/auth'
-import { listInvoices } from '@/lib/invoices-db'
+import { listInvoices, getRecurringByUser, processRecurring } from '@/lib/invoices-db'
 import { Button } from '@/components/ui/button'
 import InvoicesList from './InvoicesList'
+import RecurringSeriesPanel from './RecurringSeriesPanel'
 
 export default async function InvoicesPage() {
   const session = await auth()
@@ -11,7 +12,20 @@ export default async function InvoicesPage() {
     redirect('/auth/login?callbackUrl=/invoices')
   }
 
+  // Auto-generate recurring invoices that are due
+  processRecurring(session.user.id)
+
   const invoices = listInvoices(session.user.id)
+  const recurringSeries = getRecurringByUser(session.user.id)
+
+  // Build a map of template invoice id -> invoice_number for display
+  const templateNumbers: Record<string, string | null> = {}
+  for (const rec of recurringSeries) {
+    const inv = invoices.find(i => i.id === rec.template_invoice_id)
+    templateNumbers[rec.template_invoice_id] = inv?.invoice_number ?? null
+  }
+
+  const recurringTemplateIds = recurringSeries.map(r => r.template_invoice_id)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -23,6 +37,10 @@ export default async function InvoicesPage() {
           </Link>
         </div>
 
+        {recurringSeries.length > 0 && (
+          <RecurringSeriesPanel series={recurringSeries} templateNumbers={templateNumbers} />
+        )}
+
         {invoices.length === 0 ? (
           <div className="text-center py-20 text-gray-500 dark:text-gray-400">
             <p className="text-lg mb-4">No saved invoices yet.</p>
@@ -31,7 +49,7 @@ export default async function InvoicesPage() {
             </Link>
           </div>
         ) : (
-          <InvoicesList invoices={invoices} />
+          <InvoicesList invoices={invoices} recurringTemplateIds={recurringTemplateIds} />
         )}
       </div>
     </div>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import DeleteButton from './DeleteButton'
+import SetRecurringModal from './SetRecurringModal'
 import type { InvoiceRow, PaymentStatus } from '@/lib/invoices-db'
 
 type FilterType = 'all' | PaymentStatus
@@ -26,7 +27,7 @@ function PaymentBadge({ status }: { status: PaymentStatus }) {
   return <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-100">Outstanding</Badge>
 }
 
-export default function InvoicesList({ invoices: initialInvoices }: { invoices: InvoiceRow[] }) {
+export default function InvoicesList({ invoices: initialInvoices, recurringTemplateIds = [] }: { invoices: InvoiceRow[]; recurringTemplateIds?: string[] }) {
   const router = useRouter()
   const [invoices, setInvoices] = useState(initialInvoices)
   const [filter, setFilter] = useState<FilterType>('all')
@@ -106,7 +107,12 @@ export default function InvoicesList({ invoices: initialInvoices }: { invoices: 
               {filtered.map((inv) => (
                 <tr key={inv.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">
-                    {inv.invoice_number || '—'}
+                    <div className="flex items-center gap-2">
+                      {inv.invoice_number || '—'}
+                      {recurringTemplateIds.includes(inv.id) && (
+                        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-100 text-xs">🔁 Recurring</Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                     {inv.client_name || '—'}
@@ -132,11 +138,16 @@ export default function InvoicesList({ invoices: initialInvoices }: { invoices: 
                       </select>
                     </div>
                   </td>
-                  <td className="px-4 py-3 flex items-center gap-2">
-                    <Link href={`/invoice?savedId=${inv.id}`}>
-                      <Button variant="outline" size="sm">Edit</Button>
-                    </Link>
-                    <DeleteButton id={inv.id} />
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link href={`/invoice?savedId=${inv.id}`}>
+                        <Button variant="outline" size="sm">Edit</Button>
+                      </Link>
+                      <DeleteButton id={inv.id} />
+                      {!recurringTemplateIds.includes(inv.id) && (
+                        <SetRecurringModal invoiceId={inv.id} invoiceNumber={inv.invoice_number} />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
