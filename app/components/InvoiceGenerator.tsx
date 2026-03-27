@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
+import EmailInvoiceModal from './EmailInvoiceModal'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { getDefaultInvoiceNumber } from '@/lib/invoiceNumber'
@@ -51,6 +52,7 @@ export interface InvoiceData {
   senderName: string
   senderAddress: string
   clientName: string
+  clientEmail: string
   clientAddress: string
   invoiceNumber: string
   invoiceDate: string
@@ -88,6 +90,7 @@ const initialData: InvoiceData = {
   senderName: '',
   senderAddress: '',
   clientName: '',
+  clientEmail: '',
   clientAddress: '',
   invoiceNumber: 'INV-001',
   invoiceDate: today,
@@ -139,8 +142,14 @@ export default function InvoiceGenerator() {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('outstanding')
   const [paymentStatusUpdating, setPaymentStatusUpdating] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [smtpConfigured, setSmtpConfigured] = useState<boolean | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    fetch('/api/smtp-status').then(r => r.json()).then(d => setSmtpConfigured(d.configured)).catch(() => setSmtpConfigured(false))
+  }, [])
 
   const handleChange = useCallback((next: InvoiceData) => {
     setData(next)
@@ -275,6 +284,7 @@ export default function InvoiceGenerator() {
   }, [])
 
   return (
+    <>
     <div className="flex flex-col lg:flex-row min-h-screen">
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50 dark:bg-gray-900">
         <div className="flex items-center justify-between mb-4">
@@ -313,6 +323,25 @@ export default function InvoiceGenerator() {
           >
             {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : saveStatus === 'error' ? 'Error saving' : '💾 Save Invoice'}
           </Button>
+          {savedInvoiceId && smtpConfigured && (
+            <Button
+              variant="outline"
+              onClick={() => setEmailModalOpen(true)}
+              title="Email invoice to client"
+            >
+              ✉ Email Invoice
+            </Button>
+          )}
+          {savedInvoiceId && smtpConfigured === false && (
+            <Button
+              variant="outline"
+              disabled
+              title="SMTP not configured"
+              className="opacity-50 cursor-not-allowed"
+            >
+              ✉ Email Invoice
+            </Button>
+          )}
         </div>
         {savedInvoiceId && (
           <div className="mt-4 flex items-center gap-3">
@@ -350,5 +379,19 @@ export default function InvoiceGenerator() {
         </div>
       </div>
     </div>
+    {savedInvoiceId && (
+      <EmailInvoiceModal
+        invoiceId={savedInvoiceId}
+        clientEmail={data.clientEmail}
+        clientName={data.clientName}
+        invoiceNumber={data.invoiceNumber}
+        senderName={data.senderName}
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        previewRef={previewRef}
+      />
+    )}
+    </>
   )
 }
+

@@ -374,7 +374,7 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
                 onValueChange={(val) => {
                   const client = apiClients.find(c => c.id === val)
                   if (client) {
-                    update({ clientName: client.name, clientAddress: client.address })
+                    update({ clientName: client.name, clientEmail: client.email || '', clientAddress: client.address })
                     clearError?.('clientName')
                   }
                 }}
@@ -407,6 +407,16 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
               className={errors.clientName ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {errors.clientName && <p className="text-red-500 text-sm mt-1">{errors.clientName}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="client-email">Client Email</Label>
+            <Input
+              id="client-email"
+              type="email"
+              value={data.clientEmail}
+              onChange={(e) => update({ clientEmail: e.target.value })}
+              placeholder="client@example.com"
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="client-address">Client Address</Label>

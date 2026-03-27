@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import DeleteButton from './DeleteButton'
 import SetRecurringModal from './SetRecurringModal'
+import EmailInvoiceModal from '@/app/components/EmailInvoiceModal'
 import type { InvoiceRow, PaymentStatus } from '@/lib/invoices-db'
 
 type FilterType = 'all' | PaymentStatus
@@ -34,6 +35,12 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
   const [updating, setUpdating] = useState<string | null>(null)
   const [sharing, setSharing] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
+  const [emailingInvoice, setEmailingInvoice] = useState<InvoiceRow | null>(null)
+  const [smtpConfigured, setSmtpConfigured] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    fetch('/api/smtp-status').then(r => r.json()).then(d => setSmtpConfigured(d.configured)).catch(() => setSmtpConfigured(false))
+  }, [])
 
   const filtered = filter === 'all' ? invoices : invoices.filter(inv => inv.payment_status === filter)
 
@@ -170,6 +177,27 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
                         {copied === inv.id ? '✓ Link Copied!' : sharing === inv.id ? 'Sharing…' : '🔗 Share'}
                       </Button>
                       <DeleteButton id={inv.id} />
+                      {smtpConfigured && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEmailingInvoice(inv)}
+                          title="Email invoice to client"
+                        >
+                          ✉ Email
+                        </Button>
+                      )}
+                      {smtpConfigured === false && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled
+                          title="SMTP not configured"
+                          className="opacity-50 cursor-not-allowed"
+                        >
+                          ✉ Email
+                        </Button>
+                      )}
                       {!recurringTemplateIds.includes(inv.id) && (
                         <SetRecurringModal invoiceId={inv.id} invoiceNumber={inv.invoice_number} />
                       )}
@@ -180,6 +208,16 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
             </tbody>
           </table>
         </div>
+      )}
+      {emailingInvoice && (
+        <EmailInvoiceModal
+          invoiceId={emailingInvoice.id}
+          clientEmail={(() => { try { return JSON.parse(emailingInvoice.data).clientEmail || '' } catch { return '' } })()}
+          clientName={emailingInvoice.client_name || ''}
+          invoiceNumber={emailingInvoice.invoice_number || ''}
+          isOpen={!!emailingInvoice}
+          onClose={() => setEmailingInvoice(null)}
+        />
       )}
     </>
   )
