@@ -19,11 +19,21 @@ db.exec(`
     client_name TEXT,
     total REAL,
     status TEXT DEFAULT 'draft',
+    payment_status TEXT NOT NULL DEFAULT 'outstanding',
     data TEXT NOT NULL,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )
 `)
+
+// Migration: add payment_status column if it doesn't exist
+try {
+  db.exec(`ALTER TABLE invoices ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'outstanding'`)
+} catch {
+  // Column already exists, ignore
+}
+
+export type PaymentStatus = 'outstanding' | 'paid' | 'overdue'
 
 export interface InvoiceRow {
   id: string
@@ -32,6 +42,7 @@ export interface InvoiceRow {
   client_name: string | null
   total: number | null
   status: string
+  payment_status: PaymentStatus
   data: string
   created_at: string
   updated_at: string
@@ -75,6 +86,14 @@ export function updateInvoice(id: string, userId: string, invoiceData: InvoiceDa
     `UPDATE invoices SET invoice_number = ?, client_name = ?, total = ?, data = ?, updated_at = datetime('now')
      WHERE id = ? AND user_id = ?`
   ).run(invoiceData.invoiceNumber || null, invoiceData.clientName || null, total, JSON.stringify(invoiceData), id, userId)
+  if (result.changes === 0) return undefined
+  return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow
+}
+
+export function updatePaymentStatus(id: string, userId: string, paymentStatus: PaymentStatus): InvoiceRow | undefined {
+  const result = db.prepare(
+    `UPDATE invoices SET payment_status = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?`
+  ).run(paymentStatus, id, userId)
   if (result.changes === 0) return undefined
   return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow
 }

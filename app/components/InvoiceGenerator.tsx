@@ -8,7 +8,9 @@ import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { getDefaultInvoiceNumber } from '@/lib/invoiceNumber'
+import type { PaymentStatus } from '@/lib/invoices-db'
 
 const DRAFT_KEY = 'ig:draft'
 
@@ -134,6 +136,8 @@ export default function InvoiceGenerator() {
   const [data, setData] = useState<InvoiceData>(() => loadDraft() ?? initialData)
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null)
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('outstanding')
+  const [paymentStatusUpdating, setPaymentStatusUpdating] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const previewRef = useRef<HTMLDivElement>(null)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -202,6 +206,7 @@ export default function InvoiceGenerator() {
           const parsed: InvoiceData = JSON.parse(row.data)
           setData(parsed)
           setSavedInvoiceId(savedId)
+          setPaymentStatus(row.payment_status ?? 'outstanding')
         } catch {
           // ignore parse errors
         }
@@ -241,6 +246,23 @@ export default function InvoiceGenerator() {
       setTimeout(() => setSaveStatus('idle'), 3000)
     }
   }, [status, savedInvoiceId, data])
+
+  const handlePaymentStatusChange = useCallback(async (newStatus: PaymentStatus) => {
+    if (!savedInvoiceId) return
+    setPaymentStatusUpdating(true)
+    try {
+      const res = await fetch(`/api/invoices/${savedInvoiceId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_status: newStatus }),
+      })
+      if (res.ok) {
+        setPaymentStatus(newStatus)
+      }
+    } finally {
+      setPaymentStatusUpdating(false)
+    }
+  }, [savedInvoiceId])
 
   const handleNewInvoice = useCallback(() => {
     clearDraft()
@@ -292,6 +314,30 @@ export default function InvoiceGenerator() {
             {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : saveStatus === 'error' ? 'Error saving' : '💾 Save Invoice'}
           </Button>
         </div>
+        {savedInvoiceId && (
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Payment status:</span>
+            {paymentStatus === 'paid' && (
+              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-100">Paid</Badge>
+            )}
+            {paymentStatus === 'overdue' && (
+              <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 hover:bg-red-100">Overdue</Badge>
+            )}
+            {paymentStatus === 'outstanding' && (
+              <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-100">Outstanding</Badge>
+            )}
+            <select
+              value={paymentStatus}
+              disabled={paymentStatusUpdating}
+              onChange={(e) => handlePaymentStatusChange(e.target.value as PaymentStatus)}
+              className="text-xs border border-gray-200 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 cursor-pointer"
+            >
+              <option value="outstanding">Outstanding</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+        )}
       </div>
       <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200 dark:bg-gray-800">
         <div className="sticky top-0">
