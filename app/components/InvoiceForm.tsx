@@ -25,6 +25,13 @@ interface SavedClient {
   address: string
 }
 
+interface ApiClient {
+  id: string
+  name: string
+  email: string
+  address: string
+}
+
 interface SenderDetails {
   senderName: string
   senderAddress: string
@@ -103,11 +110,20 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
 
   // Saved clients list (drives datalist)
   const [savedClients, setSavedClients] = useState<SavedClient[]>([])
+  // API clients from server
+  const [apiClients, setApiClients] = useState<ApiClient[]>([])
 
   // Restore saved clients list on mount
   useEffect(() => {
     const clients = lsGet<SavedClient[]>(LS_CLIENTS)
     if (clients) setSavedClients(clients)
+  }, [])
+
+  // Fetch API clients
+  useEffect(() => {
+    fetch('/api/clients').then(r => r.ok ? r.json() : []).then((clients: ApiClient[]) => {
+      if (Array.isArray(clients)) setApiClients(clients)
+    }).catch(() => {})
   }, [])
 
   // Restore sender details once on mount
@@ -350,6 +366,30 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
               Save client
             </Button>
           </div>
+          {apiClients.length > 0 && (
+            <div className="space-y-1.5">
+              <Label htmlFor="client-select-dropdown">Select client</Label>
+              <Select
+                value=""
+                onValueChange={(val) => {
+                  const client = apiClients.find(c => c.id === val)
+                  if (client) {
+                    update({ clientName: client.name, clientAddress: client.address })
+                    clearError?.('clientName')
+                  }
+                }}
+              >
+                <SelectTrigger id="client-select-dropdown">
+                  <SelectValue placeholder="Pick a saved client…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {apiClients.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="client-name-input">Client Name</Label>
             {/* datalist for browser-native autocomplete */}
