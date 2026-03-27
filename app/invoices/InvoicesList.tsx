@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import DeleteButton from './DeleteButton'
 import SetRecurringModal from './SetRecurringModal'
 import EmailInvoiceModal from '@/app/components/EmailInvoiceModal'
+import ReminderEmailModal from './ReminderEmailModal'
 import type { InvoiceRow, PaymentStatus } from '@/lib/invoices-db'
 
 // Inline SVG icons (Radix-style)
@@ -142,6 +143,7 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
   const [sharing, setSharing] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [emailingInvoice, setEmailingInvoice] = useState<InvoiceRow | null>(null)
+  const [reminderInvoice, setReminderInvoice] = useState<InvoiceRow | null>(null)
   const [smtpConfigured, setSmtpConfigured] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -307,6 +309,17 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
                           ✉ Email
                         </Button>
                       )}
+                      {smtpConfigured && inv.payment_status === 'overdue' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setReminderInvoice(inv)}
+                          title="Send payment reminder"
+                          className="border-orange-300 text-orange-600 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-950"
+                        >
+                          🔔 Remind
+                        </Button>
+                      )}
                       {!recurringTemplateIds.includes(inv.id) && (
                         <SetRecurringModal invoiceId={inv.id} invoiceNumber={inv.invoice_number} />
                       )}
@@ -326,6 +339,18 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
           invoiceNumber={emailingInvoice.invoice_number || ''}
           isOpen={!!emailingInvoice}
           onClose={() => setEmailingInvoice(null)}
+        />
+      )}
+      {reminderInvoice && (
+        <ReminderEmailModal
+          invoiceId={reminderInvoice.id}
+          clientEmail={(() => { try { return JSON.parse(reminderInvoice.data).clientEmail || '' } catch { return '' } })()}
+          clientName={reminderInvoice.client_name || ''}
+          invoiceNumber={reminderInvoice.invoice_number || ''}
+          invoiceTotal={reminderInvoice.total ?? undefined}
+          dueDate={(() => { try { return JSON.parse(reminderInvoice.data).dueDate || '' } catch { return '' } })()}
+          isOpen={!!reminderInvoice}
+          onClose={() => setReminderInvoice(null)}
         />
       )}
     </>
