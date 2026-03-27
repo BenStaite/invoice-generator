@@ -35,10 +35,12 @@ try {
 
 // Migration: add share_token column if it doesn't exist
 try {
-  db.exec(`ALTER TABLE invoices ADD COLUMN share_token TEXT UNIQUE`)
+  db.exec(`ALTER TABLE invoices ADD COLUMN share_token TEXT`)
 } catch {
   // Column already exists, ignore
 }
+// Create unique index separately (SQLite doesn't support UNIQUE on ALTER TABLE ADD COLUMN)
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_invoices_share_token ON invoices(share_token) WHERE share_token IS NOT NULL`)
 
 export type PaymentStatus = 'outstanding' | 'paid' | 'overdue'
 
