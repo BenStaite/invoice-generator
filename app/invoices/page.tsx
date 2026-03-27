@@ -5,6 +5,7 @@ import { listInvoices, getRecurringByUser, processRecurring } from '@/lib/invoic
 import { Button } from '@/components/ui/button'
 import InvoicesList from './InvoicesList'
 import RecurringSeriesPanel from './RecurringSeriesPanel'
+import UpgradeBanner from '@/components/UpgradeBanner'
 
 export default async function InvoicesPage() {
   const session = await auth()
@@ -36,6 +37,8 @@ export default async function InvoicesPage() {
             <Button>+ New Invoice</Button>
           </Link>
         </div>
+
+        <UpgradeBanner isPro={session.user.isPro ?? false} />
 
         {recurringSeries.length > 0 && (
           <RecurringSeriesPanel series={recurringSeries} templateNumbers={templateNumbers} />

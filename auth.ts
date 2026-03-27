@@ -1,18 +1,24 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
-import { getUserByEmail } from './lib/auth-db'
+import { getUserByEmail, isUserPro } from './lib/auth-db'
 import { authConfig } from './auth.config'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   callbacks: {
     jwt({ token, user }) {
-      if (user?.id) token.id = user.id
+      if (user?.id) {
+        token.id = user.id
+        token.isPro = isUserPro(user.id)
+      }
       return token
     },
     session({ session, token }) {
-      if (token.id && session.user) session.user.id = token.id as string
+      if (token.id && session.user) {
+        session.user.id = token.id as string
+        session.user.isPro = token.isPro as boolean
+      }
       return session
     },
   },
