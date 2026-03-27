@@ -52,6 +52,7 @@ export interface InvoiceData {
   senderName: string
   senderAddress: string
   clientName: string
+  clientEmail: string
   clientAddress: string
   invoiceNumber: string
   invoiceDate: string
@@ -89,6 +90,7 @@ const initialData: InvoiceData = {
   senderName: '',
   senderAddress: '',
   clientName: '',
+  clientEmail: '',
   clientAddress: '',
   invoiceNumber: 'INV-001',
   invoiceDate: today,
@@ -380,7 +382,7 @@ export default function InvoiceGenerator() {
     {savedInvoiceId && (
       <EmailInvoiceModal
         invoiceId={savedInvoiceId}
-        clientEmail=""
+        clientEmail={data.clientEmail}
         clientName={data.clientName}
         invoiceNumber={data.invoiceNumber}
         senderName={data.senderName}

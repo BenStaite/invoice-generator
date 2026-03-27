@@ -212,7 +212,7 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
       {emailingInvoice && (
         <EmailInvoiceModal
           invoiceId={emailingInvoice.id}
-          clientEmail=""
+          clientEmail={(() => { try { return JSON.parse(emailingInvoice.data).clientEmail || '' } catch { return '' } })()}
           clientName={emailingInvoice.client_name || ''}
           invoiceNumber={emailingInvoice.invoice_number || ''}
           isOpen={!!emailingInvoice}
