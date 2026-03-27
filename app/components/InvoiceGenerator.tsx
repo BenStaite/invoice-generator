@@ -286,7 +286,7 @@ export default function InvoiceGenerator() {
   return (
     <>
     <div className="flex flex-col lg:flex-row min-h-screen">
-      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-background">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Invoice Details</h2>
           <div className="flex items-center gap-2">
@@ -359,7 +359,7 @@ export default function InvoiceGenerator() {
               value={paymentStatus}
               disabled={paymentStatusUpdating}
               onChange={(e) => handlePaymentStatusChange(e.target.value as PaymentStatus)}
-              className="text-xs border border-gray-200 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 cursor-pointer"
+              className="text-xs border border-border rounded px-2 py-1 bg-background text-foreground disabled:opacity-50 cursor-pointer"
             >
               <option value="outstanding">Outstanding</option>
               <option value="paid">Paid</option>
@@ -368,9 +368,9 @@ export default function InvoiceGenerator() {
           </div>
         )}
       </div>
-      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-gray-200 dark:bg-gray-800">
+      <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-muted">
         <div className="sticky top-0">
-          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-4">
             Live Preview
           </p>
           <div ref={previewRef} id="invoice-preview" className="bg-white text-gray-900">

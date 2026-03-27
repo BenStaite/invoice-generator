@@ -93,8 +93,8 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
             onClick={() => setFilter(f.key)}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
               filter === f.key
-                ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                ? 'bg-foreground text-background'
+                : 'bg-background text-muted-foreground border border-border hover:bg-muted'
             }`}
           >
             {f.label}
@@ -115,9 +115,9 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
           <p>No invoices match this filter.</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="bg-card rounded-lg shadow overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wide">
+            <thead className="bg-muted text-muted-foreground uppercase text-xs tracking-wide">
               <tr>
                 <th className="text-left px-4 py-3">Invoice #</th>
                 <th className="text-left px-4 py-3">Client</th>
@@ -154,7 +154,7 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
                         value={inv.payment_status}
                         disabled={updating === inv.id}
                         onChange={(e) => handleStatusChange(inv.id, e.target.value as PaymentStatus)}
-                        className="text-xs border border-gray-200 dark:border-gray-600 rounded px-1.5 py-1 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50 cursor-pointer"
+                        className="text-xs border border-border rounded px-1.5 py-1 bg-background text-foreground disabled:opacity-50 cursor-pointer"
                       >
                         <option value="outstanding">Outstanding</option>
                         <option value="paid">Paid</option>

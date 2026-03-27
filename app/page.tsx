@@ -64,7 +64,7 @@ export default function LandingPage() {
         {/* Hero */}
         <section className="py-24 px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               <CheckIcon className="w-4 h-4" />
               Free &amp; No Signup Required
             </div>
@@ -93,8 +93,8 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Card className="border-0 shadow-sm">
                 <CardContent className="pt-8 pb-8 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
-                    <DownloadIcon className="w-6 h-6 text-blue-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-xl mb-4">
+                    <DownloadIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Instant PDF</h3>
                   <p className="text-gray-500 text-sm">
@@ -104,8 +104,8 @@ export default function LandingPage() {
               </Card>
               <Card className="border-0 shadow-sm">
                 <CardContent className="pt-8 pb-8 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
-                    <LockOpen1Icon className="w-6 h-6 text-blue-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-xl mb-4">
+                    <LockOpen1Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">No Signup</h3>
                   <p className="text-gray-500 text-sm">
@@ -115,8 +115,8 @@ export default function LandingPage() {
               </Card>
               <Card className="border-0 shadow-sm">
                 <CardContent className="pt-8 pb-8 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-xl mb-4">
-                    <FileTextIcon className="w-6 h-6 text-blue-600" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-xl mb-4">
+                    <FileTextIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Professional</h3>
                   <p className="text-gray-500 text-sm">

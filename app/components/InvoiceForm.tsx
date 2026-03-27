@@ -299,7 +299,7 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
                 <img
                   src={data.logo}
                   alt="Business logo"
-                  className="max-h-12 max-w-[120px] object-contain rounded border border-gray-200 dark:border-gray-700 bg-white p-1"
+                  className="max-h-12 max-w-[120px] object-contain rounded border border-border bg-background p-1"
                 />
                 <Button
                   type="button"

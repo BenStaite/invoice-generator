@@ -28,7 +28,7 @@ export default async function InvoicesPage() {
   const recurringTemplateIds = recurringSeries.map(r => r.template_invoice_id)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Saved Invoices</h1>

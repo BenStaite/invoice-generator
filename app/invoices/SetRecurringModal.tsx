@@ -47,7 +47,7 @@ export default function SetRecurringModal({ invoiceId, invoiceNumber }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+          <div className="bg-card text-card-foreground rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">
               Set Recurring Invoice
             </h2>
@@ -62,7 +62,7 @@ export default function SetRecurringModal({ invoiceId, invoiceNumber }: Props) {
                 <select
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value as typeof frequency)}
-                  className="w-full border border-gray-200 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"
+                  className="w-full border border-border rounded px-3 py-2 bg-background text-foreground text-sm"
                 >
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
@@ -78,7 +78,7 @@ export default function SetRecurringModal({ invoiceId, invoiceNumber }: Props) {
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                   required
-                  className="w-full border border-gray-200 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm"
+                  className="w-full border border-border rounded px-3 py-2 bg-background text-foreground text-sm"
                 />
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
