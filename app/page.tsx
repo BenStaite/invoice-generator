@@ -128,6 +128,72 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Pricing */}
+        <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
+              Simple, transparent pricing
+            </h2>
+            <p className="text-gray-500 text-center mb-12">
+              Start free — upgrade when you need more.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {/* Free */}
+              <Card className="border border-gray-200 dark:border-gray-700 shadow-sm">
+                <CardContent className="pt-8 pb-8 flex flex-col h-full">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Free</h3>
+                    <p className="text-gray-500 text-sm mb-4">No account needed</p>
+                    <div className="flex items-end gap-1">
+                      <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">£0</span>
+                      <span className="text-gray-500 mb-1">/ forever</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {["Instant PDF download", "No signup required", "Professional templates"].map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <CheckIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant="outline" className="w-full rounded-xl">
+                    <Link href="/invoice">Get Started Free</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Pro */}
+              <Card className="border-2 border-blue-500 shadow-md">
+                <CardContent className="pt-8 pb-8 flex flex-col h-full">
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Pro</h3>
+                      <span className="text-xs font-medium bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">Popular</span>
+                    </div>
+                    <p className="text-gray-500 text-sm mb-4">For freelancers &amp; small businesses</p>
+                    <div className="flex items-end gap-1">
+                      <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">£4.99</span>
+                      <span className="text-gray-500 mb-1">/ month</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {["Save invoices", "Manage clients", "Recurring invoices", "Email reminders", "Revenue dashboard"].map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <CheckIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild className="w-full rounded-xl shadow-md">
+                    <Link href="/auth/signup">Get Pro</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-20 px-4 text-center">
           <div className="max-w-xl mx-auto">
