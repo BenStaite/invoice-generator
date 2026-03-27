@@ -33,6 +33,15 @@ try {
   // Column already exists, ignore
 }
 
+// Migration: add share_token column if it doesn't exist
+try {
+  db.exec(`ALTER TABLE invoices ADD COLUMN share_token TEXT`)
+} catch {
+  // Column already exists, ignore
+}
+// Create unique index separately (SQLite doesn't support UNIQUE on ALTER TABLE ADD COLUMN)
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_invoices_share_token ON invoices(share_token) WHERE share_token IS NOT NULL`)
+
 export type PaymentStatus = 'outstanding' | 'paid' | 'overdue'
 
 export interface InvoiceRow {
@@ -101,6 +110,33 @@ export function updatePaymentStatus(id: string, userId: string, paymentStatus: P
 export function deleteInvoice(id: string, userId: string): boolean {
   const result = db.prepare('DELETE FROM invoices WHERE id = ? AND user_id = ?').run(id, userId)
   return result.changes > 0
+}
+
+export function generateShareToken(invoiceId: string, userId: string): string | null {
+  // Check if token already exists
+  const row = db.prepare('SELECT share_token FROM invoices WHERE id = ? AND user_id = ?').get(invoiceId, userId) as { share_token: string | null } | undefined
+  if (!row) return null
+  if (row.share_token) return row.share_token
+  const token = randomUUID()
+  db.prepare("UPDATE invoices SET share_token = ? WHERE id = ? AND user_id = ?").run(token, invoiceId, userId)
+  return token
+}
+
+export interface SharedInvoiceData {
+  id: string
+  invoice_number: string | null
+  client_name: string | null
+  total: number | null
+  created_at: string
+  updated_at: string
+  data: string
+}
+
+export function getInvoiceByShareToken(token: string): SharedInvoiceData | undefined {
+  const row = db.prepare(
+    'SELECT id, invoice_number, client_name, total, created_at, updated_at, data FROM invoices WHERE share_token = ?'
+  ).get(token) as SharedInvoiceData | undefined
+  return row
 }
 
 // ── Recurring invoices ──────────────────────────────────────────────────────

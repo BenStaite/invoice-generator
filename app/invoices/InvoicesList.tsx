@@ -32,6 +32,8 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
   const [invoices, setInvoices] = useState(initialInvoices)
   const [filter, setFilter] = useState<FilterType>('all')
   const [updating, setUpdating] = useState<string | null>(null)
+  const [sharing, setSharing] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
 
   const filtered = filter === 'all' ? invoices : invoices.filter(inv => inv.payment_status === filter)
 
@@ -49,6 +51,21 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
       }
     } finally {
       setUpdating(null)
+    }
+  }
+
+  async function handleShare(id: string) {
+    setSharing(id)
+    try {
+      const res = await fetch(`/api/invoices/${id}/share`, { method: 'POST' })
+      if (res.ok) {
+        const { shareUrl } = await res.json()
+        await navigator.clipboard.writeText(shareUrl)
+        setCopied(id)
+        setTimeout(() => setCopied(prev => prev === id ? null : prev), 2500)
+      }
+    } finally {
+      setSharing(null)
     }
   }
 
@@ -143,6 +160,15 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
                       <Link href={`/invoice?savedId=${inv.id}`}>
                         <Button variant="outline" size="sm">Edit</Button>
                       </Link>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={sharing === inv.id}
+                        onClick={() => handleShare(inv.id)}
+                        className={copied === inv.id ? 'border-green-500 text-green-600' : ''}
+                      >
+                        {copied === inv.id ? '✓ Link Copied!' : sharing === inv.id ? 'Sharing…' : '🔗 Share'}
+                      </Button>
                       <DeleteButton id={inv.id} />
                       {!recurringTemplateIds.includes(inv.id) && (
                         <SetRecurringModal invoiceId={inv.id} invoiceNumber={inv.invoice_number} />
