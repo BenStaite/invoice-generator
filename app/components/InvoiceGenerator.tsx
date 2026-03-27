@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
+import { useSession } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 import InvoiceForm from './InvoiceForm'
 import InvoicePreview from './InvoicePreview'
 import DownloadPDFButton from './DownloadPDFButton'
@@ -127,8 +129,12 @@ export interface ValidationErrors {
 
 export default function InvoiceGenerator() {
   const { theme, setTheme } = useTheme()
+  const { status } = useSession()
+  const searchParams = useSearchParams()
   const [data, setData] = useState<InvoiceData>(() => loadDraft() ?? initialData)
   const [errors, setErrors] = useState<ValidationErrors>({})
+  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const previewRef = useRef<HTMLDivElement>(null)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -184,6 +190,58 @@ export default function InvoiceGenerator() {
     }
   }, [])
 
+  // Load from saved invoice if savedId param is present
+  useEffect(() => {
+    const savedId = searchParams.get('savedId')
+    if (!savedId) return
+    fetch(`/api/invoices/${savedId}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((row) => {
+        if (!row) return
+        try {
+          const parsed: InvoiceData = JSON.parse(row.data)
+          setData(parsed)
+          setSavedInvoiceId(savedId)
+        } catch {
+          // ignore parse errors
+        }
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleSave = useCallback(async () => {
+    if (status === 'unauthenticated') {
+      alert('Sign in to save invoices')
+      return
+    }
+    setSaveStatus('saving')
+    try {
+      let res: Response
+      if (savedInvoiceId) {
+        res = await fetch(`/api/invoices/${savedInvoiceId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+      } else {
+        res = await fetch('/api/invoices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+      }
+      if (!res.ok) throw new Error('Save failed')
+      const row = await res.json()
+      if (!savedInvoiceId) setSavedInvoiceId(row.id)
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    } catch {
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    }
+  }, [status, savedInvoiceId, data])
+
   const handleNewInvoice = useCallback(() => {
     clearDraft()
     setErrors({})
@@ -214,10 +272,24 @@ export default function InvoiceGenerator() {
           </div>
         </div>
         <InvoiceForm data={data} onChange={handleChange} errors={errors} clearError={clearError} />
-        <div className="mt-6 flex gap-2">
+        <div className="mt-6 flex flex-wrap gap-2 items-center">
           <DownloadPDFButton data={data} previewRef={previewRef} onValidate={() => validateForm(data)} />
           <Button variant="outline" onClick={() => window.print()}>
             Print
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleSave}
+            disabled={saveStatus === 'saving'}
+            className={
+              saveStatus === 'saved'
+                ? 'border-green-500 text-green-700 dark:text-green-400'
+                : saveStatus === 'error'
+                ? 'border-red-500 text-red-700 dark:text-red-400'
+                : ''
+            }
+          >
+            {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : saveStatus === 'error' ? 'Error saving' : '💾 Save Invoice'}
           </Button>
         </div>
       </div>

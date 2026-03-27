@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import InvoiceGenerator from '../components/InvoiceGenerator'
 
 export const metadata: Metadata = {
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default function InvoicePage() {
-  return <InvoiceGenerator />
+  return (
+    <Suspense>
+      <InvoiceGenerator />
+    </Suspense>
+  )
 }
