@@ -18,6 +18,9 @@ export function Header() {
         <nav className="flex items-center gap-3">
           {status === 'loading' ? null : session ? (
             <>
+              <Link href="/clients" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hidden sm:inline">
+                Clients
+              </Link>
               <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
                 Signed in as {session.user?.email}
               </span>
