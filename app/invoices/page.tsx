@@ -14,10 +14,10 @@ export default async function InvoicesPage() {
   }
 
   // Auto-generate recurring invoices that are due
-  processRecurring(session.user.id)
+  await processRecurring(session.user.id)
 
-  const invoices = listInvoices(session.user.id)
-  const recurringSeries = getRecurringByUser(session.user.id)
+  const invoices = await listInvoices(session.user.id)
+  const recurringSeries = await getRecurringByUser(session.user.id)
 
   // Build a map of template invoice id -> invoice_number for display
   const templateNumbers: Record<string, string | null> = {}

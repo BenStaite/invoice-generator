@@ -12,7 +12,7 @@ export async function POST(
   }
 
   const { id } = await params
-  const token = generateShareToken(id, session.user.id)
+  const token = await generateShareToken(id, session.user.id)
 
   if (!token) {
     return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })

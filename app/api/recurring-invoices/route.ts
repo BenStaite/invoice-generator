@@ -8,7 +8,7 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const recurring = getRecurringByUser(session.user.id)
+  const recurring = await getRecurringByUser(session.user.id)
   return NextResponse.json(recurring)
 }
 
@@ -21,6 +21,6 @@ export async function POST(request: Request) {
   if (!body.template_invoice_id || !body.frequency || !body.next_due_date) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
-  const rec = createRecurring(session.user.id, body.template_invoice_id, body.frequency, body.next_due_date)
+  const rec = await createRecurring(session.user.id, body.template_invoice_id, body.frequency, body.next_due_date)
   return NextResponse.json(rec, { status: 201 })
 }
