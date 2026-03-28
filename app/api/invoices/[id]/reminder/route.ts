@@ -14,7 +14,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params
-  const invoice = getInvoice(id, session.user.id)
+  const invoice = await getInvoice(id, session.user.id)
   if (!invoice) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }

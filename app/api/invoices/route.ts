@@ -8,7 +8,7 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const invoices = listInvoices(session.user.id)
+  const invoices = await listInvoices(session.user.id)
   return NextResponse.json(invoices)
 }
 
@@ -18,6 +18,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body: InvoiceData = await request.json()
-  const invoice = createInvoice(session.user.id, body)
+  const invoice = await createInvoice(session.user.id, body)
   return NextResponse.json(invoice, { status: 201 })
 }

@@ -1,46 +1,6 @@
-import Database from 'better-sqlite3'
-import path from 'path'
-import fs from 'fs'
+import { db } from './db'
 import { randomUUID } from 'crypto'
 import type { InvoiceData } from '@/app/components/InvoiceGenerator'
-
-const dataDir = path.join(process.cwd(), 'data')
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true })
-}
-
-const db = new Database(path.join(dataDir, 'invoices.db'))
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS invoices (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    invoice_number TEXT,
-    client_name TEXT,
-    total REAL,
-    status TEXT DEFAULT 'draft',
-    payment_status TEXT NOT NULL DEFAULT 'outstanding',
-    data TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-  )
-`)
-
-// Migration: add payment_status column if it doesn't exist
-try {
-  db.exec(`ALTER TABLE invoices ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'outstanding'`)
-} catch {
-  // Column already exists, ignore
-}
-
-// Migration: add share_token column if it doesn't exist
-try {
-  db.exec(`ALTER TABLE invoices ADD COLUMN share_token TEXT`)
-} catch {
-  // Column already exists, ignore
-}
-// Create unique index separately (SQLite doesn't support UNIQUE on ALTER TABLE ADD COLUMN)
-db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_invoices_share_token ON invoices(share_token) WHERE share_token IS NOT NULL`)
 
 export type PaymentStatus = 'outstanding' | 'paid' | 'overdue'
 
@@ -52,6 +12,7 @@ export interface InvoiceRow {
   total: number | null
   status: string
   payment_status: PaymentStatus
+  share_token: string | null
   data: string
   created_at: string
   updated_at: string
@@ -71,54 +32,86 @@ function extractTotal(invoiceData: InvoiceData): number {
   return afterDiscount + tax
 }
 
-export function createInvoice(userId: string, invoiceData: InvoiceData): InvoiceRow {
+export async function createInvoice(userId: string, invoiceData: InvoiceData): Promise<InvoiceRow> {
   const id = randomUUID()
   const total = extractTotal(invoiceData)
-  db.prepare(
-    `INSERT INTO invoices (id, user_id, invoice_number, client_name, total, status, data)
-     VALUES (?, ?, ?, ?, ?, 'draft', ?)`
-  ).run(id, userId, invoiceData.invoiceNumber || null, invoiceData.clientName || null, total, JSON.stringify(invoiceData))
-  return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow
+  await db.execute({
+    sql: `INSERT INTO invoices (id, user_id, invoice_number, client_name, total, status, data)
+          VALUES (?, ?, ?, ?, ?, 'draft', ?)`,
+    args: [id, userId, invoiceData.invoiceNumber || null, invoiceData.clientName || null, total, JSON.stringify(invoiceData)],
+  })
+  const result = await db.execute({
+    sql: 'SELECT * FROM invoices WHERE id = ?',
+    args: [id],
+  })
+  return result.rows[0] as unknown as InvoiceRow
 }
 
-export function listInvoices(userId: string): InvoiceRow[] {
-  return db.prepare('SELECT * FROM invoices WHERE user_id = ? ORDER BY updated_at DESC').all(userId) as InvoiceRow[]
+export async function listInvoices(userId: string): Promise<InvoiceRow[]> {
+  const result = await db.execute({
+    sql: 'SELECT * FROM invoices WHERE user_id = ? ORDER BY updated_at DESC',
+    args: [userId],
+  })
+  return result.rows as unknown as InvoiceRow[]
 }
 
-export function getInvoice(id: string, userId: string): InvoiceRow | undefined {
-  return db.prepare('SELECT * FROM invoices WHERE id = ? AND user_id = ?').get(id, userId) as InvoiceRow | undefined
+export async function getInvoice(id: string, userId: string): Promise<InvoiceRow | undefined> {
+  const result = await db.execute({
+    sql: 'SELECT * FROM invoices WHERE id = ? AND user_id = ?',
+    args: [id, userId],
+  })
+  return result.rows[0] as unknown as InvoiceRow | undefined
 }
 
-export function updateInvoice(id: string, userId: string, invoiceData: InvoiceData): InvoiceRow | undefined {
+export async function updateInvoice(id: string, userId: string, invoiceData: InvoiceData): Promise<InvoiceRow | undefined> {
   const total = extractTotal(invoiceData)
-  const result = db.prepare(
-    `UPDATE invoices SET invoice_number = ?, client_name = ?, total = ?, data = ?, updated_at = datetime('now')
-     WHERE id = ? AND user_id = ?`
-  ).run(invoiceData.invoiceNumber || null, invoiceData.clientName || null, total, JSON.stringify(invoiceData), id, userId)
-  if (result.changes === 0) return undefined
-  return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow
+  const result = await db.execute({
+    sql: `UPDATE invoices SET invoice_number = ?, client_name = ?, total = ?, data = ?, updated_at = datetime('now')
+          WHERE id = ? AND user_id = ?`,
+    args: [invoiceData.invoiceNumber || null, invoiceData.clientName || null, total, JSON.stringify(invoiceData), id, userId],
+  })
+  if (result.rowsAffected === 0) return undefined
+  const row = await db.execute({
+    sql: 'SELECT * FROM invoices WHERE id = ?',
+    args: [id],
+  })
+  return row.rows[0] as unknown as InvoiceRow
 }
 
-export function updatePaymentStatus(id: string, userId: string, paymentStatus: PaymentStatus): InvoiceRow | undefined {
-  const result = db.prepare(
-    `UPDATE invoices SET payment_status = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?`
-  ).run(paymentStatus, id, userId)
-  if (result.changes === 0) return undefined
-  return db.prepare('SELECT * FROM invoices WHERE id = ?').get(id) as InvoiceRow
+export async function updatePaymentStatus(id: string, userId: string, paymentStatus: PaymentStatus): Promise<InvoiceRow | undefined> {
+  const result = await db.execute({
+    sql: `UPDATE invoices SET payment_status = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?`,
+    args: [paymentStatus, id, userId],
+  })
+  if (result.rowsAffected === 0) return undefined
+  const row = await db.execute({
+    sql: 'SELECT * FROM invoices WHERE id = ?',
+    args: [id],
+  })
+  return row.rows[0] as unknown as InvoiceRow
 }
 
-export function deleteInvoice(id: string, userId: string): boolean {
-  const result = db.prepare('DELETE FROM invoices WHERE id = ? AND user_id = ?').run(id, userId)
-  return result.changes > 0
+export async function deleteInvoice(id: string, userId: string): Promise<boolean> {
+  const result = await db.execute({
+    sql: 'DELETE FROM invoices WHERE id = ? AND user_id = ?',
+    args: [id, userId],
+  })
+  return result.rowsAffected > 0
 }
 
-export function generateShareToken(invoiceId: string, userId: string): string | null {
-  // Check if token already exists
-  const row = db.prepare('SELECT share_token FROM invoices WHERE id = ? AND user_id = ?').get(invoiceId, userId) as { share_token: string | null } | undefined
-  if (!row) return null
+export async function generateShareToken(invoiceId: string, userId: string): Promise<string | null> {
+  const existing = await db.execute({
+    sql: 'SELECT share_token FROM invoices WHERE id = ? AND user_id = ?',
+    args: [invoiceId, userId],
+  })
+  if (!existing.rows[0]) return null
+  const row = existing.rows[0] as unknown as { share_token: string | null }
   if (row.share_token) return row.share_token
   const token = randomUUID()
-  db.prepare("UPDATE invoices SET share_token = ? WHERE id = ? AND user_id = ?").run(token, invoiceId, userId)
+  await db.execute({
+    sql: 'UPDATE invoices SET share_token = ? WHERE id = ? AND user_id = ?',
+    args: [token, invoiceId, userId],
+  })
   return token
 }
 
@@ -132,26 +125,15 @@ export interface SharedInvoiceData {
   data: string
 }
 
-export function getInvoiceByShareToken(token: string): SharedInvoiceData | undefined {
-  const row = db.prepare(
-    'SELECT id, invoice_number, client_name, total, created_at, updated_at, data FROM invoices WHERE share_token = ?'
-  ).get(token) as SharedInvoiceData | undefined
-  return row
+export async function getInvoiceByShareToken(token: string): Promise<SharedInvoiceData | undefined> {
+  const result = await db.execute({
+    sql: 'SELECT id, invoice_number, client_name, total, created_at, updated_at, data FROM invoices WHERE share_token = ?',
+    args: [token],
+  })
+  return result.rows[0] as unknown as SharedInvoiceData | undefined
 }
 
 // ── Recurring invoices ──────────────────────────────────────────────────────
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS recurring_invoices (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    template_invoice_id TEXT NOT NULL,
-    frequency TEXT NOT NULL,
-    next_due_date TEXT NOT NULL,
-    active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT DEFAULT (datetime('now'))
-  )
-`)
 
 export type RecurringFrequency = 'weekly' | 'monthly' | 'quarterly'
 
@@ -165,29 +147,38 @@ export interface RecurringInvoiceRow {
   created_at: string
 }
 
-export function createRecurring(
+export async function createRecurring(
   userId: string,
   templateInvoiceId: string,
   frequency: RecurringFrequency,
   nextDueDate: string
-): RecurringInvoiceRow {
+): Promise<RecurringInvoiceRow> {
   const id = randomUUID()
-  db.prepare(
-    `INSERT INTO recurring_invoices (id, user_id, template_invoice_id, frequency, next_due_date, active)
-     VALUES (?, ?, ?, ?, ?, 1)`
-  ).run(id, userId, templateInvoiceId, frequency, nextDueDate)
-  return db.prepare('SELECT * FROM recurring_invoices WHERE id = ?').get(id) as RecurringInvoiceRow
+  await db.execute({
+    sql: `INSERT INTO recurring_invoices (id, user_id, template_invoice_id, frequency, next_due_date, active)
+          VALUES (?, ?, ?, ?, ?, 1)`,
+    args: [id, userId, templateInvoiceId, frequency, nextDueDate],
+  })
+  const result = await db.execute({
+    sql: 'SELECT * FROM recurring_invoices WHERE id = ?',
+    args: [id],
+  })
+  return result.rows[0] as unknown as RecurringInvoiceRow
 }
 
-export function getRecurringByUser(userId: string): RecurringInvoiceRow[] {
-  return db.prepare('SELECT * FROM recurring_invoices WHERE user_id = ? ORDER BY created_at DESC').all(userId) as RecurringInvoiceRow[]
+export async function getRecurringByUser(userId: string): Promise<RecurringInvoiceRow[]> {
+  const result = await db.execute({
+    sql: 'SELECT * FROM recurring_invoices WHERE user_id = ? ORDER BY created_at DESC',
+    args: [userId],
+  })
+  return result.rows as unknown as RecurringInvoiceRow[]
 }
 
-export function updateRecurring(
+export async function updateRecurring(
   id: string,
   userId: string,
   fields: Partial<Pick<RecurringInvoiceRow, 'frequency' | 'next_due_date' | 'active'>>
-): RecurringInvoiceRow | undefined {
+): Promise<RecurringInvoiceRow | undefined> {
   const sets: string[] = []
   const values: unknown[] = []
   if (fields.frequency !== undefined) { sets.push('frequency = ?'); values.push(fields.frequency) }
@@ -195,13 +186,24 @@ export function updateRecurring(
   if (fields.active !== undefined) { sets.push('active = ?'); values.push(fields.active) }
   if (sets.length === 0) return undefined
   values.push(id, userId)
-  db.prepare(`UPDATE recurring_invoices SET ${sets.join(', ')} WHERE id = ? AND user_id = ?`).run(...values)
-  return db.prepare('SELECT * FROM recurring_invoices WHERE id = ?').get(id) as RecurringInvoiceRow | undefined
+  const result = await db.execute({
+    sql: `UPDATE recurring_invoices SET ${sets.join(', ')} WHERE id = ? AND user_id = ?`,
+    args: values as (string | number | null)[],
+  })
+  if (result.rowsAffected === 0) return undefined
+  const row = await db.execute({
+    sql: 'SELECT * FROM recurring_invoices WHERE id = ?',
+    args: [id],
+  })
+  return row.rows[0] as unknown as RecurringInvoiceRow | undefined
 }
 
-export function deleteRecurring(id: string, userId: string): boolean {
-  const result = db.prepare('DELETE FROM recurring_invoices WHERE id = ? AND user_id = ?').run(id, userId)
-  return result.changes > 0
+export async function deleteRecurring(id: string, userId: string): Promise<boolean> {
+  const result = await db.execute({
+    sql: 'DELETE FROM recurring_invoices WHERE id = ? AND user_id = ?',
+    args: [id, userId],
+  })
+  return result.rowsAffected > 0
 }
 
 function advanceDate(dateStr: string, frequency: RecurringFrequency): string {
@@ -216,44 +218,53 @@ function advanceDate(dateStr: string, frequency: RecurringFrequency): string {
   return d.toISOString().slice(0, 10)
 }
 
-export function processRecurring(userId: string): void {
+export async function processRecurring(userId: string): Promise<void> {
   const today = new Date().toISOString().slice(0, 10)
-  const due = db.prepare(
-    `SELECT * FROM recurring_invoices WHERE user_id = ? AND active = 1 AND next_due_date <= ?`
-  ).all(userId, today) as RecurringInvoiceRow[]
+  const dueResult = await db.execute({
+    sql: `SELECT * FROM recurring_invoices WHERE user_id = ? AND active = 1 AND next_due_date <= ?`,
+    args: [userId, today],
+  })
+  const due = dueResult.rows as unknown as RecurringInvoiceRow[]
 
-  // Get max invoice number for user to auto-increment
-  const invoiceRows = db.prepare('SELECT invoice_number FROM invoices WHERE user_id = ?').all(userId) as { invoice_number: string | null }[]
+  // Get max invoice number for user
+  const invoiceRows = await db.execute({
+    sql: 'SELECT invoice_number FROM invoices WHERE user_id = ?',
+    args: [userId],
+  })
   let maxNum = 0
-  for (const row of invoiceRows) {
+  for (const row of invoiceRows.rows as unknown as { invoice_number: string | null }[]) {
     if (row.invoice_number) {
       const n = parseInt(row.invoice_number.replace(/\D/g, ''), 10)
       if (!isNaN(n) && n > maxNum) maxNum = n
     }
   }
 
-  const processLoop = db.transaction(() => {
-    for (const rec of due) {
-      const template = db.prepare('SELECT * FROM invoices WHERE id = ? AND user_id = ?').get(rec.template_invoice_id, userId) as InvoiceRow | undefined
-      if (!template) continue
+  for (const rec of due) {
+    const templateResult = await db.execute({
+      sql: 'SELECT * FROM invoices WHERE id = ? AND user_id = ?',
+      args: [rec.template_invoice_id, userId],
+    })
+    const template = templateResult.rows[0] as unknown as InvoiceRow | undefined
+    if (!template) continue
 
-      const parsed = JSON.parse(template.data) as InvoiceData
-      maxNum++
-      const newInvoiceNumber = String(maxNum).padStart(4, '0')
-      parsed.invoiceNumber = newInvoiceNumber
+    const parsed = JSON.parse(template.data) as InvoiceData
+    maxNum++
+    const newInvoiceNumber = String(maxNum).padStart(4, '0')
+    parsed.invoiceNumber = newInvoiceNumber
 
-      const newId = randomUUID()
-      const total = extractTotal(parsed)
-      db.prepare(
-        `INSERT INTO invoices (id, user_id, invoice_number, client_name, total, status, data)
-         VALUES (?, ?, ?, ?, ?, 'draft', ?)`
-      ).run(newId, userId, newInvoiceNumber, parsed.clientName || null, total, JSON.stringify(parsed))
+    const newId = randomUUID()
+    const total = extractTotal(parsed)
 
-      // Advance next_due_date
-      const newDate = advanceDate(rec.next_due_date, rec.frequency)
-      db.prepare('UPDATE recurring_invoices SET next_due_date = ? WHERE id = ?').run(newDate, rec.id)
-    }
-  })
-
-  processLoop()
+    await db.batch([
+      {
+        sql: `INSERT INTO invoices (id, user_id, invoice_number, client_name, total, status, data)
+              VALUES (?, ?, ?, ?, ?, 'draft', ?)`,
+        args: [newId, userId, newInvoiceNumber, parsed.clientName || null, total, JSON.stringify(parsed)],
+      },
+      {
+        sql: 'UPDATE recurring_invoices SET next_due_date = ? WHERE id = ?',
+        args: [advanceDate(rec.next_due_date, rec.frequency), rec.id],
+      },
+    ], 'write')
+  }
 }

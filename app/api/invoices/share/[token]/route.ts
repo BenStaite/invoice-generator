@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params
-  const invoice = getInvoiceByShareToken(token)
+  const invoice = await getInvoiceByShareToken(token)
 
   if (!invoice) {
     return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })

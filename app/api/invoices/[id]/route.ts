@@ -12,7 +12,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const { id } = await params
-  const invoice = getInvoice(id, session.user.id)
+  const invoice = await getInvoice(id, session.user.id)
   if (!invoice) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
@@ -33,7 +33,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!VALID_PAYMENT_STATUSES.includes(ps)) {
       return NextResponse.json({ error: 'Invalid payment_status' }, { status: 400 })
     }
-    const invoice = updatePaymentStatus(id, session.user.id, ps as PaymentStatus)
+    const invoice = await updatePaymentStatus(id, session.user.id, ps as PaymentStatus)
     if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(invoice)
   }
@@ -43,7 +43,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Invalid payment_status' }, { status: 400 })
   }
 
-  const invoice = updateInvoice(id, session.user.id, body as InvoiceData)
+  const invoice = await updateInvoice(id, session.user.id, body as InvoiceData)
   if (!invoice) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
@@ -56,7 +56,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const { id } = await params
-  const ok = deleteInvoice(id, session.user.id)
+  const ok = await deleteInvoice(id, session.user.id)
   if (!ok) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }

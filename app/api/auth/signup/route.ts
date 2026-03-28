@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
   }
 
-  const existing = getUserByEmail(email)
+  const existing = await getUserByEmail(email)
   if (existing) {
     return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 })
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
   const id = randomUUID()
-  createUser(id, email, passwordHash)
+  await createUser(id, email, passwordHash)
 
   return NextResponse.json({ success: true })
 }
