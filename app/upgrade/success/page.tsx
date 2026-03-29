@@ -9,7 +9,7 @@ export default function UpgradeSuccessPage() {
           You&apos;re now a Pro member!
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-8">
-          Thank you for subscribing to Swiftbill Pro. All features are now unlocked.
+          Thank you for subscribing to Billdrop Pro. All features are now unlocked.
         </p>
         <Link
           href="/invoices"

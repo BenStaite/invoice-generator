@@ -15,7 +15,7 @@ export function Header() {
             <rect width="28" height="28" rx="6" fill="#2563eb"/>
             <path d="M7 8h14M7 12h10M7 16h12M7 20h8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          <span className="text-blue-600">Swiftbill</span>
+          <span className="text-blue-600">Billdrop</span>
         </Link>
         <nav className="flex items-center gap-3">
           {status === 'loading' ? null : session ? (

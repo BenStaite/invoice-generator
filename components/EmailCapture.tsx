@@ -35,7 +35,7 @@ export default function EmailCapture() {
           Stay in the loop
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mb-8">
-          Get notified about new features and updates from Swiftbill.
+          Get notified about new features and updates from Billdrop.
         </p>
 
         {status === 'success' ? (

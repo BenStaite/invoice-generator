@@ -15,22 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Swiftbill",
-  description: "Create and send professional invoices with Swiftbill",
-  metadataBase: new URL("https://swiftbill.app"),
+  title: "Billdrop",
+  description: "Create and send professional invoices with Billdrop",
+  metadataBase: new URL("https://billdrop.app"),
   alternates: { canonical: '/' },
   openGraph: {
-    title: "Swiftbill – Professional Invoicing",
-    description: "Create and send professional invoices with Swiftbill. Free PDF invoicing, Pro tier for £4.99/month.",
+    title: "Billdrop – Professional Invoicing",
+    description: "Create and send professional invoices with Billdrop. Free PDF invoicing, Pro tier for £4.99/month.",
     type: "website",
-    url: "https://swiftbill.app",
-    siteName: "Swiftbill",
+    url: "https://billdrop.app",
+    siteName: "Billdrop",
     images: ['/opengraph-image'],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Swiftbill – Professional Invoicing",
-    description: "Create and send professional invoices with Swiftbill. Free PDF invoicing, Pro tier for £4.99/month.",
+    title: "Billdrop – Professional Invoicing",
+    description: "Create and send professional invoices with Billdrop. Free PDF invoicing, Pro tier for £4.99/month.",
     images: ['/opengraph-image'],
   },
 };
