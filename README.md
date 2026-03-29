@@ -1,6 +1,6 @@
-# Invoice Generator
+# Invoxa
 
-A client-side invoice generator built with Next.js 14 and Tailwind CSS.
+A professional invoicing app for freelancers and small businesses, built with Next.js and Tailwind CSS.
 
 ## Features
 

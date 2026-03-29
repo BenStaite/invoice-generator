@@ -15,22 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Free Invoice Generator - Instant PDF, No Signup",
-  description: "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
-  metadataBase: new URL("https://invoicegenerator.tools"), // TODO: confirm final production domain
+  title: "Invoxa - Professional Invoicing for Freelancers & Small Businesses",
+  description: "Create professional invoices in seconds with Invoxa. Free PDF download, no signup required. Upgrade for client management, recurring invoices, and more.",
+  metadataBase: new URL("https://invoxa.app"),
   alternates: { canonical: '/' },
   openGraph: {
-    title: "Free Invoice Generator - Instant PDF, No Signup",
-    description: "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+    title: "Invoxa - Professional Invoicing for Freelancers & Small Businesses",
+    description: "Create professional invoices in seconds with Invoxa. Free PDF download, no signup required.",
     type: "website",
-    url: "https://invoicegenerator.tools",
-    siteName: "Free Invoice Generator",
+    url: "https://invoxa.app",
+    siteName: "Invoxa",
     images: ['/opengraph-image'],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Invoice Generator - Instant PDF, No Signup",
-    description: "Create professional invoices in seconds. Free, no signup required.",
+    title: "Invoxa - Professional Invoicing for Freelancers & Small Businesses",
+    description: "Create professional invoices in seconds with Invoxa. Free, no signup required.",
     images: ['/opengraph-image'],
   },
 };

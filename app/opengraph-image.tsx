@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'Free Invoice Generator - Instant PDF, No Signup'
+export const alt = 'Invoxa - Professional Invoicing for Freelancers & Small Businesses'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -22,7 +22,7 @@ export default async function Image() {
         }}
       >
         <div style={{ fontSize: 80, fontWeight: 700, color: '#1e293b', marginBottom: 24 }}>
-          📄 Free Invoice Generator
+          📄 Invoxa
         </div>
         <div style={{ fontSize: 36, color: '#64748b' }}>
           Instant PDF · No Signup Required · 100% Free

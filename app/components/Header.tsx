@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
-import { FileTextIcon } from '@radix-ui/react-icons'
+import { InvoxaWordmark } from '@/components/InvoxaLogo'
 
 export function Header() {
   const { data: session, status } = useSession()
@@ -11,9 +11,8 @@ export function Header() {
   return (
     <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100">
-          <FileTextIcon className="w-5 h-5 text-blue-600" />
-          Invoice Generator
+        <Link href="/" className="flex items-center gap-2">
+          <InvoxaWordmark />
         </Link>
         <nav className="flex items-center gap-3">
           {status === 'loading' ? null : session ? (
