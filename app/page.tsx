@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
     type: "website",
-    url: "https://invoicegenerator.app",
+    url: "https://invoice.hermes-cecil.uk",
     siteName: "Free Invoice Generator",
   },
   twitter: {
@@ -35,7 +35,7 @@ export default function LandingPage() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Free Invoice Generator",
-    url: "https://invoicegenerator.app",
+    url: "https://invoice.hermes-cecil.uk",
     description:
       "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
     applicationCategory: "BusinessApplication",
