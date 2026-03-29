@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "How to Create a Professional Invoice as a Freelancer | Swiftbill",
+  title: "How to Create a Professional Invoice as a Freelancer | Billdrop",
   description:
     "Step-by-step guide to creating professional invoices as a freelancer. Learn what to include, how to format, and use a free invoice template to get paid faster.",
   openGraph: {
-    title: "How to Create a Professional Invoice as a Freelancer | Swiftbill",
+    title: "How to Create a Professional Invoice as a Freelancer | Billdrop",
     description:
       "Step-by-step guide to creating professional invoices as a freelancer. Learn what to include, how to format, and use a free invoice template to get paid faster.",
     type: "article",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "How to Create a Professional Invoice as a Freelancer | Swiftbill",
+    title: "How to Create a Professional Invoice as a Freelancer | Billdrop",
     description:
       "Step-by-step guide to creating professional invoices as a freelancer. Learn what to include, how to format, and use a free invoice template to get paid faster.",
   },
@@ -113,7 +113,7 @@ export default function BlogPost() {
               <div>
                 <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Choose your invoicing method</h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                  You can create invoices in Microsoft Word, Google Docs, a spreadsheet, or use a dedicated free invoice generator like Swiftbill. A dedicated tool saves time, reduces errors, and produces a consistent professional result every time.
+                  You can create invoices in Microsoft Word, Google Docs, a spreadsheet, or use a dedicated free invoice generator like Billdrop. A dedicated tool saves time, reduces errors, and produces a consistent professional result every time.
                 </p>
               </div>
             </div>
@@ -189,12 +189,12 @@ export default function BlogPost() {
           </p>
           <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
             <Link href="/invoice" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-              Swiftbill&apos;s free invoice generator
+              Billdrop&apos;s free invoice generator
             </Link>{" "}
             lets you create and download professional invoices in seconds — no account required. Just fill in your details, add your line items, and download as a PDF. It&apos;s completely free for basic invoice creation.
           </p>
           <div className="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-lg p-5 my-6">
-            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-2">Why use Swiftbill?</p>
+            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-2">Why use Billdrop?</p>
             <ul className="space-y-2 text-sm text-indigo-700 dark:text-indigo-300">
               <li>✓ Free to create and download invoices — no account needed</li>
               <li>✓ Professional PDF output, ready to send</li>
@@ -212,7 +212,7 @@ export default function BlogPost() {
           <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
             If you find yourself creating invoices regularly,{" "}
             <Link href="/upgrade" className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-              upgrading to Swiftbill Pro
+              upgrading to Billdrop Pro
             </Link>{" "}
             gives you unlimited invoice history, client management, and priority support — all for £4.99/month.
           </p>
@@ -316,7 +316,7 @@ export default function BlogPost() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 leading-relaxed">
                 Use a free invoice generator like{" "}
                 <Link href="/invoice" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                  Swiftbill
+                  Billdrop
                 </Link>
                 . Fill in your details, add your line items, and download a professional PDF invoice instantly — no account or card required.
               </p>
