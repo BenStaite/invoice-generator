@@ -18,6 +18,9 @@ export function Header() {
           <span className="text-blue-600">Billdrop</span>
         </Link>
         <nav className="flex items-center gap-3">
+          <Link href="/pricing" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hidden sm:inline">
+            Pricing
+          </Link>
           {status === 'loading' ? null : session ? (
             <>
               <Link href="/clients" className="text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hidden sm:inline">
