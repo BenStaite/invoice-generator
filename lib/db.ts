@@ -94,4 +94,33 @@ export async function initDb() {
       args: [],
     },
   ], 'deferred')
+
+  // Add stripe_customer_id column if it doesn't exist
+  try {
+    await db.execute({ sql: `ALTER TABLE users ADD COLUMN stripe_customer_id TEXT`, args: [] })
+  } catch {
+    // Column already exists — ignore
+  }
+}
+
+export async function setUserPro(userId: string, isPro: boolean, stripeCustomerId?: string) {
+  if (stripeCustomerId) {
+    await db.execute({
+      sql: `UPDATE users SET is_pro = ?, stripe_customer_id = ? WHERE id = ? OR email = ?`,
+      args: [isPro ? 1 : 0, stripeCustomerId, userId, userId],
+    })
+  } else {
+    await db.execute({
+      sql: `UPDATE users SET is_pro = ? WHERE id = ? OR email = ?`,
+      args: [isPro ? 1 : 0, userId, userId],
+    })
+  }
+}
+
+export async function getUserByStripeCustomerId(customerId: string) {
+  const result = await db.execute({
+    sql: `SELECT * FROM users WHERE stripe_customer_id = ?`,
+    args: [customerId],
+  })
+  return result.rows[0] ?? null
 }
