@@ -227,7 +227,7 @@ export default function InvoiceForm({ data, onChange, errors = {}, clearError }:
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Swiftbill</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Billdrop</h1>
 
       {/* Template & Currency */}
       <div className="grid grid-cols-2 gap-4">

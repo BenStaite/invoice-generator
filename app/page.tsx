@@ -12,22 +12,22 @@ import {
 } from "@radix-ui/react-icons";
 
 export const metadata: Metadata = {
-  title: "Swiftbill – Create Professional Invoices",
+  title: "Billdrop – Create Professional Invoices",
   description:
-    "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
+    "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
   openGraph: {
-    title: "Swiftbill – Create Professional Invoices",
+    title: "Billdrop – Create Professional Invoices",
     description:
-      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
+      "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
     type: "website",
-    url: "https://swiftbill.app",
-    siteName: "Swiftbill",
+    url: "https://billdrop.app",
+    siteName: "Billdrop",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Swiftbill – Create Professional Invoices",
+    title: "Billdrop – Create Professional Invoices",
     description:
-      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
+      "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
   },
 };
 
@@ -35,10 +35,10 @@ export default function LandingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Swiftbill",
-    url: "https://swiftbill.app",
+    name: "Billdrop",
+    url: "https://billdrop.app",
     description:
-      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
+      "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
     applicationCategory: "BusinessApplication",
     operatingSystem: "All",
     offers: [
@@ -84,7 +84,7 @@ export default function LandingPage() {
               Free PDF invoicing — no signup needed
             </div>
             <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-5 leading-tight">
-              Create invoices in seconds with Swiftbill
+              Create invoices in seconds with Billdrop
             </h1>
             <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
               Free PDF invoicing for everyone. Upgrade to Pro for £4.99/month and unlock client management, recurring invoices, and more.
@@ -227,7 +227,7 @@ export default function LandingPage() {
         </section>
 
         <footer className="py-8 text-center text-gray-400 text-sm border-t border-gray-100 dark:border-gray-700">
-          Swiftbill — Professional invoicing, free to start
+          Billdrop — Professional invoicing, free to start
         </footer>
       </main>
     </>

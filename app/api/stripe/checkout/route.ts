@@ -22,7 +22,7 @@ export async function POST() {
             currency: 'gbp',
             unit_amount: 499,
             recurring: { interval: 'month' },
-            product_data: { name: 'Swiftbill Pro' },
+            product_data: { name: 'Billdrop Pro' },
           },
           quantity: 1,
         },
