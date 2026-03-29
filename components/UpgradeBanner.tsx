@@ -17,14 +17,12 @@ export default function UpgradeBanner({ isPro }: UpgradeBannerProps) {
             <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-100">Upgrade to Pro</h2>
             <span className="rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-semibold text-white">£4.99/month</span>
           </div>
-          <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-3">Unlock the full suite of features:</p>
+          <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-3">Support Billdrop and help us keep it free:</p>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm text-indigo-800 dark:text-indigo-200">
             {[
-              'Save invoices',
-              'Manage clients',
-              'Set up recurring invoices',
-              'Email reminders',
-              'Revenue dashboard',
+              'Support ongoing development',
+              'Priority access to new features',
+              'Help keep Billdrop free',
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-1.5">
                 <svg className="w-4 h-4 text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
