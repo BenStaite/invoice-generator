@@ -11,22 +11,22 @@ import {
 } from "@radix-ui/react-icons";
 
 export const metadata: Metadata = {
-  title: "Free Invoice Generator - Instant PDF, No Signup",
+  title: "Swiftbill – Create Professional Invoices",
   description:
-    "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+    "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
   openGraph: {
-    title: "Free Invoice Generator - Instant PDF, No Signup",
+    title: "Swiftbill – Create Professional Invoices",
     description:
-      "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
     type: "website",
-    url: "https://invoicegenerator.app",
-    siteName: "Free Invoice Generator",
+    url: "https://swiftbill.app",
+    siteName: "Swiftbill",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Invoice Generator - Instant PDF, No Signup",
+    title: "Swiftbill – Create Professional Invoices",
     description:
-      "Create professional invoices in seconds. Free, no signup required.",
+      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
   },
 };
 
@@ -34,23 +34,37 @@ export default function LandingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Free Invoice Generator",
-    url: "https://invoicegenerator.app",
+    name: "Swiftbill",
+    url: "https://swiftbill.app",
     description:
-      "Create professional invoices in seconds. Fill in your details, add line items, and download a PDF instantly. Free, no signup required.",
+      "Create and send professional invoices with Swiftbill. Free PDF invoicing with Pro tier for £4.99/month.",
     applicationCategory: "BusinessApplication",
     operatingSystem: "All",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
+    offers: [
+      {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "GBP",
+        name: "Free",
+      },
+      {
+        "@type": "Offer",
+        price: "4.99",
+        priceCurrency: "GBP",
+        name: "Pro",
+      },
+    ],
     featureList: [
       "Instant PDF download",
       "No signup required",
       "Professional invoice templates",
       "Line item management",
       "Automatic totals",
+      "Save invoices",
+      "Manage clients",
+      "Recurring invoices",
+      "Email reminders",
+      "Revenue dashboard",
     ],
   };
 
@@ -66,14 +80,13 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               <CheckIcon className="w-4 h-4" />
-              Free &amp; No Signup Required
+              Free PDF invoicing — no signup needed
             </div>
             <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-5 leading-tight">
-              Create Professional Invoices Instantly
+              Create invoices in seconds with Swiftbill
             </h1>
             <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
-              Fill in your details, add line items, and download a polished PDF
-              invoice in seconds.
+              Free PDF invoicing for everyone. Upgrade to Pro for £4.99/month and unlock client management, recurring invoices, and more.
             </p>
             <Button asChild size="lg" className="text-base px-8 py-6 rounded-xl shadow-md">
               <Link href="/invoice" className="inline-flex items-center gap-2">
@@ -109,7 +122,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">No Signup</h3>
                   <p className="text-gray-500 text-sm">
-                    No account needed. Just fill in your details and download.
+                    No account needed for free tier. Just fill in your details and download.
                   </p>
                 </CardContent>
               </Card>
@@ -146,7 +159,7 @@ export default function LandingPage() {
                     <p className="text-gray-500 text-sm mb-4">No account needed</p>
                     <div className="flex items-end gap-1">
                       <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">£0</span>
-                      <span className="text-gray-500 mb-1">/ forever</span>
+                      <span className="text-gray-500 mb-1">/ mo</span>
                     </div>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
@@ -178,7 +191,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
-                    {["Save invoices", "Manage clients", "Recurring invoices", "Email reminders", "Revenue dashboard"].map((feature) => (
+                    {["Everything in Free", "Save invoices", "Manage clients", "Recurring invoices", "Email reminders", "Revenue dashboard"].map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                         <CheckIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
                         {feature}
@@ -210,7 +223,7 @@ export default function LandingPage() {
         </section>
 
         <footer className="py-8 text-center text-gray-400 text-sm border-t border-gray-100 dark:border-gray-700">
-          Free Invoice Generator — No signup required
+          Swiftbill — Professional invoicing, free to start
         </footer>
       </main>
     </>
