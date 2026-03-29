@@ -12,22 +12,22 @@ import {
 } from "@radix-ui/react-icons";
 
 export const metadata: Metadata = {
-  title: "Billdrop – Create Professional Invoices",
+  title: "Billdrop – Free Invoice Generator UK | Create Professional Invoices",
   description:
-    "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
+    "The best free invoice generator for UK freelancers and small businesses. Create professional PDF invoices instantly — no signup needed. Pro plan from £4.99/month.",
   openGraph: {
-    title: "Billdrop – Create Professional Invoices",
+    title: "Billdrop – Free Invoice Generator UK | Create Professional Invoices",
     description:
-      "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
+      "The best free invoice generator for UK freelancers and small businesses. Create professional PDF invoices instantly — no signup needed. Pro plan from £4.99/month.",
     type: "website",
     url: "https://billdrop.app",
     siteName: "Billdrop",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Billdrop – Create Professional Invoices",
+    title: "Billdrop – Free Invoice Generator UK | Create Professional Invoices",
     description:
-      "Create and send professional invoices with Billdrop. Free PDF invoicing with Pro tier for £4.99/month.",
+      "The best free invoice generator for UK freelancers and small businesses. Create professional PDF invoices instantly — no signup needed. Pro plan from £4.99/month.",
   },
 };
 
@@ -75,6 +75,55 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is Billdrop really free?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) unlocks client management, invoice history, recurring invoices, and email reminders."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use Billdrop as a free invoice generator in the UK?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Absolutely. Billdrop is designed with UK freelancers and small businesses in mind. Invoices include GBP currency support, VAT fields, and a professional layout that meets UK invoicing standards."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need to create an account to make an invoice?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No account is needed for the free tier. Just open the invoice form, fill in your details, and download your PDF."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What information does a UK invoice need to include?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A valid UK invoice should include: your name or business name, your address, the client's name and address, a unique invoice number, the invoice date, a description of goods or services, the amount charged (and VAT if applicable), and payment terms."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is Billdrop different from other invoice generators?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Billdrop is fast, clean, and built for freelancers who just want to send an invoice — not manage a full accounting system. It's free for basic use, works without an account, and generates professional PDFs instantly."
+              }
+            }
+          ]
+        }) }}
+      />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Hero */}
         <section className="py-24 px-4 text-center">
@@ -84,10 +133,10 @@ export default function LandingPage() {
               Free PDF invoicing — no signup needed
             </div>
             <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-5 leading-tight">
-              Create invoices in seconds with Billdrop
+              Free Invoice Generator for UK Freelancers
             </h1>
             <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
-              Free PDF invoicing for everyone. Upgrade to Pro for £4.99/month and unlock client management, recurring invoices, and more.
+              Create professional PDF invoices in seconds. No account needed — just fill in your details and download. Used by hundreds of UK freelancers and small businesses.
             </p>
             <Button asChild size="lg" className="text-base px-8 py-6 rounded-xl shadow-md">
               <Link href="/invoice" className="inline-flex items-center gap-2">
@@ -102,7 +151,7 @@ export default function LandingPage() {
         <section className="py-16 px-4 bg-white dark:bg-gray-800">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-12">
-              Everything you need, nothing you don&apos;t
+              Built for UK freelancers and small businesses
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Card className="border-0 shadow-sm">
@@ -210,6 +259,51 @@ export default function LandingPage() {
 
         {/* Email Capture */}
         <EmailCapture />
+
+        {/* FAQ */}
+        <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-10">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-6">
+              {[
+                {
+                  q: "Is Billdrop really free?",
+                  a: "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) unlocks client management, invoice history, recurring invoices, and email reminders."
+                },
+                {
+                  q: "Can I use Billdrop as a free invoice generator in the UK?",
+                  a: "Absolutely. Billdrop is designed with UK freelancers and small businesses in mind. Invoices include GBP currency support, VAT fields, and a professional layout that meets UK invoicing standards."
+                },
+                {
+                  q: "Do I need to create an account to make an invoice?",
+                  a: "No account is needed for the free tier. Just open the invoice form, fill in your details, and download your PDF. If you want to save invoices and manage clients, you can sign up for a free account or upgrade to Pro."
+                },
+                {
+                  q: "What information does a UK invoice need to include?",
+                  a: "A valid UK invoice should include: your name or business name, your address, the client's name and address, a unique invoice number, the invoice date, a description of goods or services, the amount charged (and VAT if applicable), and payment terms. Billdrop's template includes all of these fields."
+                },
+                {
+                  q: "How is Billdrop different from other invoice generators?",
+                  a: "Billdrop is fast, clean, and built for freelancers who just want to send an invoice — not manage a full accounting system. It's free for basic use, works without an account, and generates professional PDFs instantly. No bloated dashboards, no unnecessary features."
+                },
+                {
+                  q: "Can I use Billdrop for VAT invoices?",
+                  a: "Yes. Billdrop includes a VAT number field and line-item tax settings so you can create fully compliant VAT invoices for your UK clients."
+                }
+              ].map(({ q, a }, i) => (
+                <details key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm cursor-pointer">
+                  <summary className="font-semibold text-gray-900 dark:text-gray-100 list-none flex justify-between items-center">
+                    {q}
+                    <span className="text-gray-400 ml-4">+</span>
+                  </summary>
+                  <p className="mt-4 text-gray-500 text-sm leading-relaxed">{a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* CTA */}
         <section className="py-20 px-4 text-center">
