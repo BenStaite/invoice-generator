@@ -144,6 +144,7 @@ export default function LandingPage() {
                 <ArrowRightIcon className="w-5 h-5" />
               </Link>
             </Button>
+            <p className="mt-4 text-sm text-gray-400">No credit card required</p>
           </div>
         </section>
 
