@@ -4,11 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const features = [
-  'Save invoices',
-  'Manage clients',
-  'Recurring invoices',
-  'Email reminders',
-  'Revenue dashboard',
+  'Support ongoing development',
+  'Priority access to new features',
+  'Help us keep Billdrop free for everyone',
 ]
 
 export default function UpgradePage() {

@@ -61,11 +61,6 @@ export default function LandingPage() {
       "Professional invoice templates",
       "Line item management",
       "Automatic totals",
-      "Save invoices",
-      "Manage clients",
-      "Recurring invoices",
-      "Email reminders",
-      "Revenue dashboard",
     ],
   };
 
@@ -86,7 +81,7 @@ export default function LandingPage() {
               "name": "Is Billdrop really free?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) unlocks client management, invoice history, recurring invoices, and email reminders."
+                "text": "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) supports ongoing development and gets you priority access to new features as we build them."
               }
             },
             {
@@ -242,7 +237,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
-                    {["Everything in Free", "Save invoices", "Manage clients", "Recurring invoices", "Email reminders", "Revenue dashboard"].map((feature) => (
+                    {["Everything in Free", "Support ongoing development", "Priority new features"].map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                         <CheckIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
                         {feature}
@@ -271,7 +266,7 @@ export default function LandingPage() {
               {[
                 {
                   q: "Is Billdrop really free?",
-                  a: "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) unlocks client management, invoice history, recurring invoices, and email reminders."
+                  a: "Yes — Billdrop is free to use with no signup required. You can create and download professional PDF invoices instantly. Our Pro plan (£4.99/month) supports ongoing development and gets you priority access to new features as we build them."
                 },
                 {
                   q: "Can I use Billdrop as a free invoice generator in the UK?",
@@ -279,7 +274,7 @@ export default function LandingPage() {
                 },
                 {
                   q: "Do I need to create an account to make an invoice?",
-                  a: "No account is needed for the free tier. Just open the invoice form, fill in your details, and download your PDF. If you want to save invoices and manage clients, you can sign up for a free account or upgrade to Pro."
+                  a: "No account is needed for the free tier. Just open the invoice form, fill in your details, and download your PDF. If you want to save invoices and manage clients, you can sign up for a free account."
                 },
                 {
                   q: "What information does a UK invoice need to include?",
