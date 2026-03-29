@@ -15,13 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Swiftbill",
-  description: "Create and send professional invoices with Swiftbill",
+  title: "Swiftbill – Free Invoice Generator for Freelancers & Small Businesses UK",
+  description: "Create professional invoices in seconds with Swiftbill. Free invoice generator for UK freelancers and small businesses. No sign-up required for basic use.",
   metadataBase: new URL("https://swiftbill.app"),
   alternates: { canonical: '/' },
   openGraph: {
-    title: "Swiftbill – Professional Invoicing",
-    description: "Create and send professional invoices with Swiftbill. Free PDF invoicing, Pro tier for £4.99/month.",
+    title: "Swiftbill – Free Invoice Generator for Freelancers & Small Businesses UK",
+    description: "Create professional invoices in seconds with Swiftbill. Free invoice generator for UK freelancers and small businesses. No sign-up required for basic use.",
     type: "website",
     url: "https://swiftbill.app",
     siteName: "Swiftbill",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Swiftbill – Professional Invoicing",
-    description: "Create and send professional invoices with Swiftbill. Free PDF invoicing, Pro tier for £4.99/month.",
+    title: "Swiftbill – Free Invoice Generator for Freelancers & Small Businesses UK",
+    description: "Create professional invoices in seconds with Swiftbill. Free invoice generator for UK freelancers and small businesses. No sign-up required for basic use.",
     images: ['/opengraph-image'],
   },
 };
