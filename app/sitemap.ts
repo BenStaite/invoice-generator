@@ -4,6 +4,7 @@ const BASE_URL = 'https://invoice-generator-pied-sigma.vercel.app'
 
 const blogPosts = [
   'free-invoice-generator-uk',
+  'how-to-create-invoice-freelancer',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
