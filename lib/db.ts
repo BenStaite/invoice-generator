@@ -117,6 +117,25 @@ export async function setUserPro(userId: string, isPro: boolean, stripeCustomerI
   }
 }
 
+export async function createEmailLeadsTable() {
+  await db.execute({
+    sql: `CREATE TABLE IF NOT EXISTS email_leads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL UNIQUE,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    args: [],
+  })
+}
+
+export async function saveEmailLead(email: string) {
+  await createEmailLeadsTable()
+  await db.execute({
+    sql: `INSERT INTO email_leads (email) VALUES (?)`,
+    args: [email],
+  })
+}
+
 export async function getUserByStripeCustomerId(customerId: string) {
   const result = await db.execute({
     sql: `SELECT * FROM users WHERE stripe_customer_id = ?`,

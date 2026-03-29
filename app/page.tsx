@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import EmailCapture from "@/components/EmailCapture";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -206,6 +207,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Email Capture */}
+        <EmailCapture />
 
         {/* CTA */}
         <section className="py-20 px-4 text-center">
