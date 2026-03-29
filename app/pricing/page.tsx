@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Swiftbill Pricing — Free & Pro Plans',
-  description: 'Compare Swiftbill Free and Pro plans. Start for free with PDF invoices and up to 3 clients, or upgrade to Pro for unlimited clients, recurring invoices, custom branding and more — just £4.99/month.',
+  title: 'Billdrop Pricing — Free & Pro Plans',
+  description: 'Compare Billdrop Free and Pro plans. Start for free with PDF invoices and up to 3 clients, or upgrade to Pro for unlimited clients, recurring invoices, custom branding and more — just £4.99/month.',
 }
 
 const features = [
