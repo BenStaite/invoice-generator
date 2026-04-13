@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import DeleteButton from './DeleteButton'
 import SetRecurringModal from './SetRecurringModal'
 import EmailInvoiceModal from '@/app/components/EmailInvoiceModal'
@@ -117,7 +118,8 @@ function RevenueSummary({ invoices }: { invoices: InvoiceRow[] }) {
   )
 }
 
-type FilterType = 'all' | PaymentStatus
+type StatusFilterType = 'all' | PaymentStatus
+type SortType = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc'
 
 const STATUS_LABELS: Record<PaymentStatus, string> = {
   outstanding: 'Outstanding',
@@ -138,7 +140,9 @@ function PaymentBadge({ status }: { status: PaymentStatus }) {
 export default function InvoicesList({ invoices: initialInvoices, recurringTemplateIds = [] }: { invoices: InvoiceRow[]; recurringTemplateIds?: string[] }) {
   const router = useRouter()
   const [invoices, setInvoices] = useState(initialInvoices)
-  const [filter, setFilter] = useState<FilterType>('all')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilterType>('all')
+  const [sort, setSort] = useState<SortType>('date-desc')
   const [updating, setUpdating] = useState<string | null>(null)
   const [sharing, setSharing] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
@@ -150,7 +154,35 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
     fetch('/api/smtp-status').then(r => r.json()).then(d => setSmtpConfigured(d.configured)).catch(() => setSmtpConfigured(false))
   }, [])
 
-  const filtered = filter === 'all' ? invoices : invoices.filter(inv => inv.payment_status === filter)
+  const activeFilterCount = (search ? 1 : 0) + (statusFilter !== 'all' ? 1 : 0) + (sort !== 'date-desc' ? 1 : 0)
+
+  function clearFilters() {
+    setSearch('')
+    setStatusFilter('all')
+    setSort('date-desc')
+  }
+
+  const filtered = useMemo(() => {
+    let list = invoices
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter(inv =>
+        (inv.client_name || '').toLowerCase().includes(q) ||
+        (inv.invoice_number || '').toLowerCase().includes(q)
+      )
+    }
+    if (statusFilter !== 'all') {
+      list = list.filter(inv => inv.payment_status === statusFilter)
+    }
+    list = [...list].sort((a, b) => {
+      if (sort === 'date-desc') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      if (sort === 'date-asc') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      if (sort === 'amount-desc') return (b.total ?? 0) - (a.total ?? 0)
+      if (sort === 'amount-asc') return (a.total ?? 0) - (b.total ?? 0)
+      return 0
+    })
+    return list
+  }, [invoices, search, statusFilter, sort])
 
   async function handleStatusChange(id: string, newStatus: PaymentStatus) {
     setUpdating(id)
@@ -184,48 +216,78 @@ export default function InvoicesList({ invoices: initialInvoices, recurringTempl
     }
   }
 
-  const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'outstanding', label: 'Outstanding' },
-    { key: 'paid', label: 'Paid' },
-    { key: 'overdue', label: 'Overdue' },
-  ]
-
   return (
     <>
       {/* Revenue Summary Cards */}
       <RevenueSummary invoices={invoices} />
 
-      {/* Filter bar */}
-      <div className="flex gap-2 mb-4">
-        {filters.map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              filter === f.key
-                ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-            }`}
+      {/* Search, Filter, Sort bar */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        {/* Search */}
+        <div className="relative flex-1 min-w-0">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+            <path fillRule="evenodd" clipRule="evenodd" d="M10 6.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm-.691 3.516a4.5 4.5 0 1 1 .707-.707l2.838 2.837a.5.5 0 0 1-.708.708L9.31 10.016Z" fill="currentColor"/>
+          </svg>
+          <Input
+            type="search"
+            placeholder="Search by client or invoice #…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 bg-card"
+            aria-label="Search invoices"
+          />
+        </div>
+
+        {/* Status filter */}
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value as StatusFilterType)}
+          className="text-sm border border-input rounded-md px-3 py-2 bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Filter by status"
+        >
+          <option value="all">All Statuses</option>
+          <option value="outstanding">Outstanding</option>
+          <option value="paid">Paid</option>
+          <option value="overdue">Overdue</option>
+        </select>
+
+        {/* Sort */}
+        <select
+          value={sort}
+          onChange={e => setSort(e.target.value as SortType)}
+          className="text-sm border border-input rounded-md px-3 py-2 bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Sort invoices"
+        >
+          <option value="date-desc">Date (Newest First)</option>
+          <option value="date-asc">Date (Oldest First)</option>
+          <option value="amount-desc">Amount (High–Low)</option>
+          <option value="amount-asc">Amount (Low–High)</option>
+        </select>
+
+        {/* Clear filters */}
+        {activeFilterCount > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearFilters}
+            className="flex items-center gap-1.5 whitespace-nowrap"
+            aria-label={`Clear ${activeFilterCount} active filter${activeFilterCount > 1 ? 's' : ''}`}
           >
-            {f.label}
-            {f.key !== 'all' && (
-              <span className="ml-1.5 text-xs opacity-60">
-                {invoices.filter(inv => inv.payment_status === f.key).length}
-              </span>
-            )}
-            {f.key === 'all' && (
-              <span className="ml-1.5 text-xs opacity-60">{invoices.length}</span>
-            )}
-          </button>
-        ))}
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary text-primary-foreground text-xs font-bold">{activeFilterCount}</span>
+            Clear filters
+          </Button>
+        )}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          <p>No invoices match this filter.</p>
+        <div className="text-center py-12 text-muted-foreground">
+          <p className="text-base font-medium">No invoices match your filters.</p>
+          {activeFilterCount > 0 && (
+            <button onClick={clearFilters} className="mt-2 text-sm underline text-primary hover:opacity-80">Clear filters</button>
+          )}
         </div>
-      ) : (
+      ) : null}
+      {filtered.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wide">
