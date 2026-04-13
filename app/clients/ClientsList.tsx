@@ -77,7 +77,7 @@ export function ClientsList({ initialClients }: { initialClients: Client[] }) {
       </div>
 
       {showNew && (
-        <form onSubmit={handleCreate} className="border rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-gray-800">
+        <form onSubmit={handleCreate} className="border border-border rounded-lg p-4 space-y-3 bg-muted">
           <h2 className="font-semibold text-sm text-gray-700 dark:text-gray-300">New Client</h2>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
